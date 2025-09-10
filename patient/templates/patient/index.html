@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+  {% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Titre de la page</title>
+  <meta name="description" content="Courte description de la page.">
+  <link rel="stylesheet" href="{% static "patient/style.css" %}">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK" crossorigin="anonymous"></script>
+  <!-- <link rel="icon" href="favicon.ico"> -->
+  <style>
+    /* Vos styles CSS ici */
+    
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href=../index.php><img src="../images/logo_woukami.jpeg"alt="" width="170px" height="50px" /></a> 
+    </div>     
+        <nav>
+            <ul>
+                <li><a href="../index.php">Accueil</a></li>
+                <li><a href="rechartisans.php">Patients</a></li>
+                <!--<li><a href="../index.php#metiers">Métiers</a></li>-->
+                <li><a href="recherche.php">Dashboard</a></li>
+                <li><a href="creationprofil.php">Paramètre</a></li>
+                <li><a href="#">Aide</a></li>
+                <a href=connexionuti.php class="button">Connexion</a>
+                <a href="profil.php" class="profil"></a>
+                
+            </ul>
+            
+        </nav>
+            
+  </header>
+
+  <main id="contenu">
+    <p class="fs-1">Votre logiciel de gestion de vaccination et nutrition</p>
+    <img src="..." class="img-fluid" alt="...">
+    
+  </main>
+
+  <footer>
+    <small>&copy; <span id="year"></span> Votre Nom.</small>
+  </footer>
+
+  <script>
+    // JS minimal : année automatique
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

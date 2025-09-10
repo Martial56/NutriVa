@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Créer un patient</title>
+    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Uniformiser les champs input et select */
+        .form-control,
+        .form-select {
+            height: 45px;       /* même hauteur */
+            font-size: 16px;    /* texte lisible */
+            padding: 10px;      /* espace interne */
+        }
+    </style>
+</head>
+<body class="m-0 p-0 bg-light">
+<div class="container-fluid p-4">
+    <h2 class="mb-4">Créer un patient</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Onglets -->
+        <ul class="nav nav-tabs" id="patientTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="constantes-tab" data-bs-toggle="tab" data-bs-target="#constantes" type="button" role="tab">Constantes</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="vaccination-tab" data-bs-toggle="tab" data-bs-target="#vaccination" type="button" role="tab">Vaccination</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="nutrition-tab" data-bs-toggle="tab" data-bs-target="#nutrition" type="button" role="tab">Nutrition</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="autres-tab" data-bs-toggle="tab" data-bs-target="#autres" type="button" role="tab">Autres services</button>
+            </li>
+        </ul>
+
+        <!-- Contenu des onglets -->
+        <div class="tab-content p-4 bg-white border border-top-0 rounded-bottom shadow-sm" id="patientTabsContent">
+
+            <!-- Onglet Constantes -->
+            <div class="tab-pane fade show active" id="constantes" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col"><input type="date" name="date" class="form-control" value="{{ today }}"></div>
+                    <div class="col"><input type="text" name="taille" class="form-control" placeholder="Taille (cm)"></div>
+                    <div class="col"><input type="text" name="poids" class="form-control" placeholder="Poids (kg)"></div>
+                    <div class="col"><input type="text" name="brachial" class="form-control" placeholder="Périmètre brachial"></div>
+                    <div class="col"><input type="text" name="imc" class="form-control" placeholder="IMC"></div>
+                    <div class="col"><input type="text" name="indice" class="form-control" placeholder="Indice corporelle"></div>
+                </div>
+            </div>
+
+            <!-- Onglet Vaccination -->
+            <div class="tab-pane fade" id="vaccination" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label><input type="checkbox" name="vaccin" value="BCG"> BCG</label><br>
+                        <label><input type="checkbox" name="vaccin" value="Polio 0"> Polio 0</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VPO-1"> VPO-1</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VPO-2"> VPO-2</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VPO-3"> VPO-3</label><br>
+                        <label><input type="checkbox" name="vaccin" value="DTC-HepB-Hib 1"> DTC-HepB-Hib 1</label><br>
+                        <label><input type="checkbox" name="vaccin" value="DTC-HepB-Hib 2"> DTC-HepB-Hib 2</label><br>
+                        <label><input type="checkbox" name="vaccin" value="DTC-HepB-Hib 3"> DTC-HepB-Hib 3</label><br>
+                    </div>
+                    <div class="col-md-4">
+                        <label><input type="checkbox" name="vaccin" value="Pneumo (PCV) 1"> Pneumo (PCV) 1</label><br>
+                        <label><input type="checkbox" name="vaccin" value="Pneumo (PCV) 2"> Pneumo (PCV) 2</label><br>
+                        <label><input type="checkbox" name="vaccin" value="Pneumo (PCV) 3"> Pneumo (PCV) 3</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VPI"> VPI</label><br>
+                        <label><input type="checkbox" name="vaccin" value="ROTA 1"> ROTA 1</label><br>
+                        <label><input type="checkbox" name="vaccin" value="ROTA 2"> ROTA 2</label><br>
+                        <label><input type="checkbox" name="vaccin" value="ROTA 3"> ROTA 3</label><br>
+                        <label><input type="checkbox" name="vaccin" value="Vaccin Anti-Amaril"> Vaccin Anti-Amaril</label><br>
+                    </div>
+                    <div class="col-md-4">
+                        <label><input type="checkbox" name="vaccin" value="Vaccin anti-rougeoleux 1"> Vaccin anti-rougeoleux 1</label><br>
+                        <label><input type="checkbox" name="vaccin" value="Vaccin anti-rougeoleux 2"> Vaccin anti-rougeoleux 2</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VAT 1"> VAT 1</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VAT 2"> VAT 2</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VAT 1er rappel"> VAT 1er rappel</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VAT 2eme rappel"> VAT 2eme rappel</label><br>
+                        <label><input type="checkbox" name="vaccin" value="VAT 3eme rappel"> VAT 3eme rappel</label><br>
+                        <label><input type="checkbox" name="vaccin" value="Vaccin anti-méningoccique"> Vaccin anti-méningoccique</label><br>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Nutrition -->
+            <div class="tab-pane fade" id="nutrition" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col"><label>Code unique patient</label><input type="text" name="codeunique" class="form-control" placeholder="AA-24-001"></div>
+                    <div class="col"><label>Date d'admission</label><input type="date" name="dateadmission" class="form-control"></div>
+                    <div class="col"><label>Date de sortie</label><input type="date" name="datesortie" class="form-control"></div>
+                    <div class="col">
+                        <label>État nutritionnel</label>
+                        <select name="statutnutri" class="form-select">
+                            <option value="" selected></option>
+                            <option value="normal">Normal</option>
+                            <option value="mam">Malnutri aigu modéré</option>
+                            <option value="mas">Malnutri aigu sévère sans complication</option>
+                            <option value="masc">Malnutri aigu sévère avec complication</option>
+                            <option value="retardCroi">Retard de croissance</option>
+                            <option value="obesite">Obésité</option>
+                        </select>
+                    </div>
+                    <div class="col"><label>Date prochain RDV</label><input type="date" name="daterdv" class="form-control"></div>
+                </div>
+            </div>
+
+            <!-- Onglet Autres services -->
+            <div class="tab-pane fade" id="autres" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col"><label>Dépisté ?</label>
+                        <input type="radio" name="depistage" > Oui
+                        <input type="radio" name="depistage" >Non
+                    </div>
+                    <div class="col"><input type="text" name="poids" class="form-control" placeholder="Code de dépistage"></div>
+                    <div class="col"><input type="text" name="brachial" class="form-control" placeholder="Périmètre brachial"></div>
+                    <div class="col"><input type="text" name="imc" class="form-control" placeholder="IMC"></div>
+                    <div class="col"><input type="text" name="indice" class="form-control" placeholder="Indice corporelle"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col"><label>Dépisté ?</label>
+                        <input type="radio" name="depistage" class="form-radio"> Oui
+                        <input type="radio" name="depistage" class="form-radio">Non
+                    </div>
+                    <div class="col"><input type="text" name="poids" class="form-control" placeholder="Code de dépistage"></div>
+                    <div class="col"><input type="text" name="brachial" class="form-control" placeholder="Périmètre brachial"></div>
+                    <div class="col"><input type="text" name="imc" class="form-control" placeholder="IMC"></div>
+                    <div class="col"><input type="text" name="indice" class="form-control" placeholder="Indice corporelle"></div>
+                </div>
+        </div>
+
+        <!-- Bouton -->
+        <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
+    </form>
+</div>
+
+<!-- Script Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
