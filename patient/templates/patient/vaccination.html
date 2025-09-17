@@ -21,6 +21,8 @@
 <div class="container-fluid p-4">
     <h2 class="mb-4">Offre de services</h2>
 
+    
+
         <!-- Onglets -->
         <ul class="nav nav-tabs" id="patientTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -29,9 +31,7 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="vaccination-tab" data-bs-toggle="tab" data-bs-target="#vaccination" type="button" role="tab">Vaccination</button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="nutrition-tab" data-bs-toggle="tab" data-bs-target="#nutrition" type="button" role="tab">Nutrition</button>
-            </li>
+            
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="autres-tab" data-bs-toggle="tab" data-bs-target="#autres" type="button" role="tab">Autres services</button>
             </li>
@@ -52,14 +52,13 @@
                         <div class="col"><input type="text" name="imc" class="form-control" placeholder="IMC"></div>
                         <div class="col"><input type="text" name="indice" class="form-control" placeholder="Indice corporelle"></div>
                     </div>
-                    <!-- Bouton -->
-                    <button type="submit" class="btn btn-primary mt-3">Soumettre</button>
+                    <button type="submit" class="btn btn-primary mt-3">Enregistrer constantes</button>
                 </form>
             </div>
 
             <!-- Onglet Vaccination -->
             <div class="tab-pane fade" id="vaccination" role="tabpanel">
-                <form method="post">
+                 <form method="post">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-4">
@@ -93,67 +92,13 @@
                             <label><input type="checkbox" name="vaccin" value="Vaccin anti-méningoccique"> Vaccin anti-méningoccique</label><br>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
+                      <button type="submit" class="btn btn-primary mt-3">Enregistrer vaccin</button>
                 </form>
             </div>
 
-            <!-- Onglet Nutrition -->
-            <div class="tab-pane fade" id="nutrition" role="tabpanel">
-                <form action="" method="post">
-                    {% csrf_token %}
-                    <div class="row mb-3">
-                        <div class="col"><label>Code unique patient</label><input type="text" name="codeunique" class="form-control" value="{{code_unique}}"></div>
-                        <div class="col"><label>Date d'admission</label><input type="date" name="dateadmission" class="form-control"></div>
-                        <div class="col"><label>Date de sortie</label><input type="date" name="datesortie" class="form-control"></div>
-                        <div class="col">
-                            <label>État nutritionnel</label>
-                            <select name="statutnutri" class="form-select">
-                                <option value="" selected></option>
-                                <option value="normal">Normal</option>
-                                <option value="mam">Malnutri aigu modéré</option>
-                                <option value="mas">Malnutri aigu sévère sans complication</option>
-                                <option value="masc">Malnutri aigu sévère avec complication</option>
-                                <option value="retardCroi">Retard de croissance</option>
-                                <option value="obesite">Obésité</option>
-                            </select>
-                        </div>
-                        <div class="col"><label>Date prochain RDV</label><input type="date" name="daterdv" class="form-control"></div>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
-                </form>
-            </div>
-
-            <!-- Onglet Autres services -->
-            <div class="tab-pane fade" id="autres" role="tabpanel">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>Dépisté ?</label><br>
-                            <label> <input type="radio" name="depistage" > Oui</label>
-                            <label> <input type="radio" name="depistage" >Non </label></br>       
-                            <label><input type="text" name="codedepistage" placeholder="Code de dépistage" > </label><br>
-                            <label>résultat de dépistage </label><br>
-                            <label><input type="radio" name="resutatdepistage" > Positif</label>
-                            <label><input type="radio" name="resutatdepistage" >Négatif</label>
-                            
-                        </div>
-                        <div class="col-md-4">
-                            <label><input type="checkbox" name="lait" value="Vaccin anti-rougeoleux 1"> Lait</label><br>
-                            <label><input type="checkbox" name="deparasitant" value="Vaccin anti-rougeoleux 2"> Déparasitant</label><br>
-                            <label><input type="checkbox" name="plumpynut" value="plompynut"> Plompy Nut</label><br>
-                            <label><input type="checkbox" name="vitamine100" value="ViTa100"> Vitamine A100</label><br>
-                            <label><input type="checkbox" name="vitamine200" value="ViTa200"> Vitamine A200</label><br>
-                            
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
-                </form>
-            </div>
-        </div>
-
+        <!-- Bouton -->
         
-    </form>
+    
 </div>
 
 <!-- Script Bootstrap -->

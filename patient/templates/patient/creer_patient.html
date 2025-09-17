@@ -9,7 +9,8 @@
     <h1 class="mb-4">Formulaire de création de patient</h1>
 
     <div class="container">
-        <form action="creationprofil.php" method="post" enctype="multipart/form-data">
+        <form action="{% url 'enregistrement_patient' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="row">
                 <div class="alert alert-success"> </div>
   
@@ -19,11 +20,12 @@
                             informations patient
                         </div>
                         <div class="card-body">
+                            
                             <div class="mb-2">
-                                <input id="code" name="code" class="form-control form-control-sm" type="text" placeholder="Code" aria-label=".form-control-sm example" readonly>
+                                <input id="nom" name="nom" class="form-control form-control-sm" type="text" placeholder="Nom" aria-label=".form-control-sm example" required>
                             </div>
                             <div class="mb-2">
-                                <input id="nom" name="nom" class="form-control form-control-sm" type="text" placeholder="Nom et prénoms" aria-label=".form-control-sm example" required>
+                                <input id="prenom" name="prenom" class="form-control form-control-sm" type="text" placeholder="Prénoms" aria-label=".form-control-sm example" required>
                             </div>
                             <div class="mb-2">
                                 <select id="sexe" name="sexe" class="form-select form-select-sm" aria-label=".form-select-sm example"required>
@@ -41,11 +43,11 @@
                 <div class="col-6">
                     <div class="card">
                         <div class="card-header bg-dark text-white">
-                            informations parent
+                            informations complémentaires
                         </div>
                         <div class="card-body">
                             <div class="mb-2">
-                                <input id="nom" name="nom" class="form-control form-control-sm" type="text" placeholder="Nom et prénoms" aria-label=".form-control-sm example" required>
+                                <input id="nom" name="nom_parent" class="form-control form-control-sm" type="text" placeholder="Nom et prénoms du parent" aria-label=".form-control-sm example" required>
                             </div>
                             <div class="mb-2">
                                 <input id="quartier" name="quartier" class="form-control form-control-sm" type="text" placeholder="Quartier" aria-label=".form-control-sm example" required>

@@ -68,53 +68,6 @@ li a:hover{
 .option{
     position: relative;
 }
-/* style de la page de constante*/
-.constante{
-    background-color: aquamarine;
-    margin: 10px;
-    border: 2px solid #007bff;
-}
-.constante input, select{
-    margin: 12px;
-    width: auto;
-    height: 20px;
-}
-
-/* style de la page de vaccination*/
-.vaccin {
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 20px 0;
-    background: #f9f9f9;
-
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 colonnes égales */
-    gap: 10px 20px; /* espace lignes et colonnes */
-}
-
-.vaccin legend {
-    grid-column: span 3; /* le titre prend toute la largeur */
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.vaccin label {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.vaccin input[type="checkbox"] {
-    margin-right: 6px;
-    margin-left: 35px;
-}
-.form-select {
-    height: 45px;       /* Même hauteur pour tous */
-    font-size: 16px;
-}
-
 
 :root { color-scheme: light dark; }
 
