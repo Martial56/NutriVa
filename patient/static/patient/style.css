@@ -1,6 +1,7 @@
 body { 
     margin: 0px;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+    background-color: darkslategray;
 }
 .logo { 
     display: block;

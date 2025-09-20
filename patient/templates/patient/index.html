@@ -1,55 +1,126 @@
 <!doctype html>
 <html lang="fr">
-  {% load static %}
+{% load static %}
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Titre de la page</title>
-  <meta name="description" content="Courte description de la page.">
+  <title>Accueil – Vaccination & Nutrition</title>
+  <meta name="description" content="Logiciel de gestion de vaccination et de nutrition.">
   <link rel="stylesheet" href="{% static 'patient/style.css' %}">
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK" crossorigin="anonymous"></script>
-  <!-- <link rel="icon" href="favicon.ico"> -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-    /* Vos styles CSS ici */
-    
+    /* Banniere principale */
+    .hero {
+      background: url("{% static 'images/hero_vaccination.jpg' %}") center/cover no-repeat;
+      color: #fff;
+      text-align: center;
+      padding: 100px 20px;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    .hero p {
+      font-size: 1.2rem;
+    }
+
+    /* Cartes */
+    .feature-card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease-in-out;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+    .feature-card img {
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+      height: 200px;
+      object-fit: cover;
+    }
   </style>
 </head>
 <body>
   {% csrf_token %}
-  <header>
-    <div class="logo">
-      <a href=../index.php><img src="../images/logo_woukami.jpeg"alt="" width="170px" height="50px" /></a> 
-    </div>     
-        <nav>
-            <ul>
-                <li><a href="{% url 'index'%}">Accueil</a></li>
-                <li><a href="{% url 'liste_patients'%}">Patients</a></li>
-                <!--<li><a href="../index.php#metiers">Métiers</a></li>-->
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Paramètre</a></li>
-                <li><a href="#">Aide</a></li>
-                <a href=connexionuti.php class="button">Connexion</a>
-                <a href="profil.php" class="profil"></a>
-                
-            </ul>
-            
-        </nav>
-            
+
+  <!-- Header -->
+  <header class="bg-light shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center py-3">
+      <a href="{% url 'index'%}" class="navbar-brand">
+        <img src="{% static 'images/logo_woukami.jpeg' %}" alt="Logo" width="170" height="50">
+      </a>
+      <nav>
+        <ul class="nav">
+          <li class="nav-item"><a class="nav-link" href="{% url 'index'%}">Accueil</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'liste_patients'%}">Patients</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Paramètre</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Aide</a></li>
+        </ul>
+      </nav>
+      <div>
+        <a href="connexionuti.php" class="btn btn-outline-primary btn-sm">Connexion</a>
+      </div>
+    </div>
   </header>
 
-  <main id="contenu">
-    <p class="fs-1">Votre logiciel de gestion de vaccination et nutrition</p>
-    <img src="..." class="img-fluid" alt="...">
-    
+  <!-- Hero section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Votre logiciel de gestion</h1>
+      <p class="lead">Vaccination • Nutrition • Suivi simplifié</p>
+      <a href="{% url 'liste_patients'%}" class="btn btn-primary btn-lg mt-3">Accéder aux patients</a>
+    </div>
+  </section>
+
+  <!-- Contenu principal -->
+  <main class="container my-5">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card feature-card">
+          <img src="{% static 'images/vaccination_banner.jpg' %}" class="card-img-top" alt="Vaccination">
+          <div class="card-body">
+            <h5 class="card-title">Vaccination</h5>
+            <p class="card-text">Suivi complet des vaccinations : calendrier, rappels et historique des patients.</p>
+            <a href="#" class="btn btn-outline-primary">En savoir plus</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card feature-card">
+          <img src="{% static 'images/nutrition_banner.jpg' %}" class="card-img-top" alt="Nutrition">
+          <div class="card-body">
+            <h5 class="card-title">Nutrition</h5>
+            <p class="card-text">Évaluation de l’état nutritionnel et planification des actions de suivi.</p>
+            <a href="#" class="btn btn-outline-success">En savoir plus</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
-  <footer>
+  <!-- Footer -->
+  <footer class="bg-light text-center py-4 mt-5">
     <small>&copy; <span id="year"></span> Votre Nom.</small>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // JS minimal : année automatique
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>

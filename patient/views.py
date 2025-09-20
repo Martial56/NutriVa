@@ -40,7 +40,7 @@ def enregistrement_patient(request):
         telephone = request.POST.get('phone')
 
         patient = Patient(
-            code="PT" + str(Patient.objects.count() + 1).zfill(4),
+           # code="PT" + str(Patient.objects.count() + 1).zfill(4),
             nom=nom,
             prenom=prenom,
             date_naissance=date_naissance,
