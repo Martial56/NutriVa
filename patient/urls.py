@@ -7,6 +7,8 @@ urlpatterns = [
     path('liste/', views.liste_patients, name="liste_patients"),
     path('constante/', views.constante, name="constante"),
     path('vaccination/', views.vaccination, name="vaccination"),
+    path('login/', views.login, name="login"),
+    path('nutrition/', views.nutrition, name="nutrition"),
  # urls.py
     path("enregistrement_patient/", views.enregistrement_patient, name="enregistrement_patient")
 

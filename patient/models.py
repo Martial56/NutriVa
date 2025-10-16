@@ -20,7 +20,7 @@ class Constante(models.Model):
    # temperature = models.FloatField()
     #tension = models.CharField(max_length=20)
     imc = models.FloatField()
-    indicecorporel = models.CharField()
+    indicecorporel = models.CharField(max_length=50)
     def __str__(self):
         return f"Constantes de {self.patient} le {self.date}"
 
@@ -45,7 +45,7 @@ class Vaccination(models.Model):
     
 class Nutrition(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    code_unique = models.CharField()
+    code_unique = models.CharField(max_length=100)
     date_visite = models.DateField()
     date_admission = models.DateField()
     date_sortie = models.DateField()

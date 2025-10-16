@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+  {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+<body class="login-body">
+
+    <div class="login-container">
+        <div class="login-box">
+            <h1 class="title">Connectez-vous</h1>
+
+            <form action="#" method="POST">
+                <div class="input-group">
+                    <input class="input_login" type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
+                    <input class="input_login" type="password" id="password" name="password" placeholder="Mot de passe" required>
+                </div>
+
+                <a href=""><button type="submit" class="btn-login">Se connecter</button></a>
+            </form>
+
+            <p class="forgot-password">
+                <a href="#">Mot de passe oublié.</a>
+            </p>
+
+            <p class="no-account">
+                Pas de compte ?
+                <a href="#" class="btn-register">S'inscrire ici</a>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>

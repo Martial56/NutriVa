@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+    {% load static %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rendez-vous nutritionnel</title>
+  <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="nutrition-body">
+
+  <header class="header-bar-nutrition">
+    <h1>Rendez-vous nutritionnel</h1>
+    <div class="header-buttons">
+      <button class="btn btn-cancel">Annuler</button>
+      <button class="btn btn-save">Enregistrer</button>
+    </div>
+  </header>
+
+  <section class="patient-info">
+    <i class="fas fa-user-circle patient-icon"></i>
+    <div class="patient-details">
+      <span class="patient-name"><strong>Nom Prénoms du patient</strong></span>
+      <span class="patient-age">Âge</span>
+      <span class="patient-sex">Sexe</span>
+    </div>
+  </section>
+
+  <main class="nutrition-form-container">
+
+    <!-- Bloc Informations générales -->
+    <div class="form-section info-box">
+      <div class="form-group">
+        <label for="code_unique">Code unique</label>
+        <input type="text" id="code_unique" name="code_unique">
+      </div>
+      <div class="form-group">
+        <label for="date_admission">Date d’admission</label>
+        <input type="date" id="date_admission" name="date_admission">
+      </div>
+      <div class="form-group">
+        <label for="etat_nutritionnel">État nutritionnel</label>
+        <select id="etat_nutri" name="etat_nutri">
+            <option value=""></option>
+            <option value="normal">Normal</option>
+            <option value="modere">Modéré</option> 
+            <option value="severe">Sévère sans complication</option>
+            <option value="severe_comp">Sévère avec complication</option>
+            <option value="surpoids">Surpoids</option>
+            <option value="obeisite">Obésité</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="date_sortie">Date de sortie</label>
+        <input type="date" id="date_sortie" name="date_sortie">
+      </div>
+      <div class="form-group btn-right">
+        <button class="btn btn-save">Enregistrer</button>
+      </div>
+    </div>
+
+    <!-- Bloc Dépistage et Produits -->
+    <div class="form-row">
+
+      <!-- Dépistage -->
+      <div class="form-section depistage-box">
+        <p><strong>Dépisté</strong></p>
+        <label><input type="radio" name="depiste" value="oui"> Oui</label>
+        <label><input type="radio" name="depiste" value="non"> Non</label>
+
+        <div class="form-group">
+          <label for="code_depistage">Code de dépistage</label>
+          <input type="text" id="code_depistage" name="code_depistage">
+        </div>
+
+        <p><strong>Résultat de dépistage</strong></p>
+        <label><input type="radio" name="resultat" value="positif"> Positif</label>
+        <label><input type="radio" name="resultat" value="negatif"> Négatif</label>
+      </div>
+
+      <!-- Produits -->
+      <div class="form-section produits-box">
+        <label><input type="checkbox" name="produits" value="lait"> Lait</label><br>
+        <label><input type="checkbox" name="produits" value="plumpy"> Plumpy Nut</label><br>
+        <label><input type="checkbox" name="produits" value="deparasitant"> Déparasitant</label><br>
+        <label><input type="checkbox" name="produits" value="vitA100"> Vitamine A100</label><br>
+        <label><input type="checkbox" name="produits" value="vitA200"> Vitamine A200</label>
+      </div>
+
+    </div>
+  </main>
+</body>
+</html>

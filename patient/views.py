@@ -8,6 +8,10 @@ from datetime import date
 def index(request):
     return render(request, 'patient/index.html')
 
+#la vue pour la page de connexion
+def login(request):
+    return render(request, 'patient/login.html')
+
 #la vue pour la page de creation de patient
 def creer_patient(request):
     return render(request, 'patient/creer_patient.html')
@@ -19,6 +23,10 @@ def constante(request):
 #la vue pour la page de saisie des vaccinations
 def vaccination(request):
     return render(request, 'patient/vaccination.html')
+
+# la vue pour la page nutrition
+def nutrition(request):
+    return render(request, 'patient/nutrition.html')
 
 #la vue pour la page de liste des patients
 def liste_patients(request):

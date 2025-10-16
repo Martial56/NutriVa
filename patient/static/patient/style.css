@@ -1,8 +1,9 @@
-body { 
+/*********************** Style de la page d'accueil ***********************/
+/*body { 
     margin: 0px;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
     background-color: darkslategray;
-}
+}*/
 .logo { 
     display: block;
 }
@@ -68,6 +69,638 @@ li a:hover{
 }
 .option{
     position: relative;
+}
+
+/************ style de la pâge connexion**********************/
+.login-body {
+    /* Fond violet similaire à l'image */
+    background-color: #6a3e9c; 
+    
+    /* background-image: url('chemin/vers/votre/image.jpg'); 
+    background-size: cover;
+    background-position: center; */
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.login-box {
+    /* Conteneur sombre et arrondi au centre */
+    background-color: rgba(0, 0, 0, 0.75); /* Noir semi-transparent */
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    /* Pour simuler le chevauchement avec la seringue, on peut ajouter une marge gauche négative si l'image de fond est utilisée et positionnée */
+    /* margin-left: -50px; */ 
+}
+
+.title {
+    color: #c90000;
+    background-color:white ; /* Rouge pour le bandeau 'Connectez-vous' */
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1.5em;
+    margin-top: -10px; /* Remonter le titre pour qu'il chevauche le bord supérieur */
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    margin-top: 40px;
+}
+
+.input_login {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid white; /* Bordure blanche pour les champs */
+    border-radius: 5px;
+    background-color: white; /* Fond transparent pour les champs de saisie */
+    margin-top: 20px;
+    box-sizing: border-box; /* Pour que le padding et la bordure soient inclus dans la largeur */
+}
+
+input::placeholder {
+    color: rgba(15, 13, 13, 0.7);
+}
+
+.btn-login {
+    width: 80%;
+    padding: 10px;
+    background-color: #38a84a; /* Vert pour le bouton 'Se connecter' */
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+
+.btn-login:hover {
+    background-color: #2c8c3a;
+}
+
+.forgot-password a {
+    color: #c90000; /* Rouge pour le lien 'Mot de passe oublié' */
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.forgot-password {
+    margin-bottom: 15px;
+}
+
+.no-account {
+    color: white;
+    font-size: 0.9em;
+}
+
+.btn-register {
+    color: #38a84a; /* Vert pour le lien 'S'inscrire ici' */
+    text-decoration: none;
+    font-weight: bold;
+    display: block; /* Mettre le lien sur une nouvelle ligne, si désiré */
+}
+
+/**************** style de la page constante*******************/
+
+.constante_body {
+    font-family: Arial, sans-serif;
+    background-color: white; /* Fond gris clair */
+    margin: 0;
+    padding: 0;
+}
+
+.main-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 20px auto;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* En-tête bleu */
+.header-bar {
+    background-color: #3f7ac5; /* Bleu similaire à l'image */
+    color: white;
+    padding: 15px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-bar h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+/* Bloc d'informations du patient */
+.patient-info-box {
+    padding: 20px 30px;
+    border-bottom: 2px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.patient-details {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+.profile-icon {
+    font-size: 3em; /* Taille de l'icône de profil */
+    margin-right: 15px;
+    color: #333;
+    /* Styles pour simuler la bordure/ombre autour de l'icône */
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.patient-name {
+    flex-grow: 1; /* Permet au nom de prendre plus de place */
+}
+
+.patient-age, .patient-sex {
+    margin-left: 50px;
+    font-weight: normal;
+}
+
+/* Zone de contenu principale (Formulaire et Note) */
+.content-area {
+    display: flex;
+    justify-content: space-around;
+    padding: 40px 30px;
+}
+
+/* Formulaire de constantes */
+.constants-form {
+    border: 1px solid #ddd;
+    padding: 30px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+    background-color: white;
+    flex-shrink: 0; /* Empêche le formulaire de se rétrécir */
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: auto 200px; /* Colonne du label puis colonne du champ */
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.form-grid label {
+    text-align: right;
+    font-weight: bold;
+    color: #555;
+    padding-right: 10px;
+    display: flex;
+    align-items: center; /* Centrer verticalement les labels */
+    justify-content: flex-end;
+}
+
+.form-grid input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Groupe de boutons */
+.button-group {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 25px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 100px;
+}
+
+.btn-vaccin, .btn-nutrition{
+    background-color: #5cb85c; /* Vert */
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Style pour le bouton grisé/désactivé (comme demandé) */
+/* Fichier style_constantes.css */
+
+/* Style pour tous les boutons désactivés/grisés */
+.btn.disabled {
+    background-color: #aaa !important; /* Gris */
+    color: #666 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+/* S'assurer que le bouton vaccin est vert par défaut */
+.btn-vaccin, .btn-nutrition {
+    background-color: #5cb85c; 
+    color: white;
+}
+/* Note d'information */
+.note-info {
+    margin-left: 50px;
+    padding-top: 50px; /* Aligner la note plus bas */
+    color: #555;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/******* style de la page liste patient **********************/
+.header-bar-liste{
+    background-color: #3f7ac5;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.kanban{
+    margin: 10%;
+}
+.icon-img {
+    width: 40px;
+    height: 40px;
+    margin-left: 30px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.icon-img:hover { transform: scale(1.1); }
+
+/* Style des cartes patient */
+.patient-card {
+    border: 1px solid #ddd;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease-in-out;
+}
+.patient-card:hover {
+    transform: translateY(-3px);
+}
+.patient-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.btnrecherche {
+    background-color: #5cb85c; /* Vert */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+/************* style de la page vaccination*******************/
+
+.vaccin-body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.main-container-vaccin {
+    width: 95%;
+    max-width: 1400px; /* Plus large pour accueillir toutes les colonnes */
+    margin: 20px auto;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding-bottom: 30px;
+}
+
+/* --- 1. En-tête (Barre bleue) --- */
+.header-bar-vaccin {
+    background-color: #3f7ac5;
+    color: white;
+    padding: 0px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-bar h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+.header-buttons .btn {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn-annuler {
+    background-color: #f0803a; /* Orange */
+}
+
+.btn-enregistrer {
+    background-color: #5cb85c; /* Vert */
+}
+
+/* --- 2. Informations du patient --- */
+.patient-info-box {
+    padding: 20px 30px;
+    border-bottom: 2px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.patient-details {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+.profile-icon {
+    font-size: 3em;
+    margin-right: 15px;
+    color: #333;
+}
+
+.patient-name {
+    flex-grow: 1;
+}
+
+.patient-age, .patient-sex {
+    margin-left: 50px;
+    font-weight: normal;
+}
+
+/* --- 3. Grille de Vaccination (Utilisation de CSS Grid) --- */
+.vaccination-grid {
+    display: grid;
+    /* Crée 7 colonnes de largeur égale */
+    grid-template-columns: repeat(7, 1fr); 
+    padding: 0 15px;
+    gap: 10px; /* Espace entre les colonnes */
+}
+
+.vaccin-column {
+    border: 1px solid #ccc;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 250px; /* Hauteur minimale pour les colonnes */
+}
+
+.column-header {
+    background-color: #eee;
+    padding: 10px 5px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.vaccin-item {
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+}
+
+.vaccin-item input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+}
+
+.vaccin-item label {
+    font-size: 0.9em;
+}
+
+/* --- Styles pour les sous-blocs (Colonnes 5 et 7) --- */
+.complex-column {
+    /* Assure que le contenu du bloc principal s'aligne en haut */
+    justify-content: flex-start; 
+}
+
+.vaccin-sub-box {
+    border: 1px solid #aaa;
+    margin: 15px 10px 10px; /* Marge autour du sous-bloc */
+    flex-grow: 1; /* Permet au sous-bloc de prendre l'espace restant */
+}
+
+.vaccin-sub-box .sub-header {
+    background-color: #ddd;
+    padding: 5px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #aaa;
+}
+
+.autre-vaccin-column {
+  /*border: 1px solid #aaa;*/
+  padding: 10px;
+  /*background-color: #f9f9f9;*/
+}
+
+.autre-vaccin-column .column-header {
+    background-color: #eee;
+    padding: 10px 5px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.vaccin-items-container {
+  display: flex;
+  flex-wrap: wrap; /* permet d'aller à la ligne si l'espace manque */
+  gap: 12px; /* espace entre les cases */
+  justify-content: flex-start;
+}
+
+.vaccin-item-autre {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /*border: 1px solid #ddd;
+  border-radius: 4px;*/
+  padding: 6px 10px;
+  /*background-color: #fff;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+  flex: 0 1 auto; /* largeur auto, mais s'adapte */
+  white-space: nowrap; /* empêche les labels de sauter à la ligne */
+}
+
+/*********************** style de la pade nutrition ******************/
+/* ---------- STRUCTURE GÉNÉRALE ---------- */
+body.nutrition-body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- HEADER ---------- */
+.header-bar-nutrition {
+  background-color: #2b73b6;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.header-bar-nutrition h1 {
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background-color: #d9534f;
+}
+
+.btn-save {
+  background-color: #4CAF50;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* ---------- PATIENT INFO ---------- */
+.patient-info {
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  margin: 10px auto;
+  width: 95%;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.patient-icon {
+  font-size: 60px;
+  margin-right: 15px;
+  color: #444;
+}
+
+.patient-details {
+  display: flex;
+  gap: 20px;
+  font-size: 1.1rem;
+}
+
+/* ---------- FORM SECTIONS ---------- */
+.nutrition-form-container {
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Bloc principal */
+.form-section {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 15px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-radius: 4px;
+}
+
+/* Informations générales */
+.info-box {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.form-group input {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Ligne inférieure : dépistage / produits */
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Dépistage */
+.depistage-box {
+  flex: 1;
+}
+
+.depistage-box label {
+  margin-right: 10px;
+}
+
+.depistage-box input[type="text"] {
+  width: 80%;
+}
+
+/* Produits */
+.produits-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+  .info-box {
+    flex-direction: column;
+  }
 }
 
 :root { color-scheme: light dark; }
