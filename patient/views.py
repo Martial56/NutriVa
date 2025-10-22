@@ -20,6 +20,10 @@ def creer_patient(request):
 def constante(request):
     return render(request, 'patient/constante.html')
 
+#la vue pour la page rendez-vous
+def rdv(request):
+    return render(request, 'patient/rdv.html')
+
 #la vue pour la page de saisie des vaccinations
 def vaccination(request):
     return render(request, 'patient/vaccination.html')
@@ -31,7 +35,7 @@ def nutrition(request):
 #la vue pour la page de liste des patients
 def liste_patients(request):
     patients = Patient.objects.all()
-    return render(request, "patient/liste_patients.html", {"patients": patients})
+    return render(request, "patient/liste_patients.html, patient/constante.html", {"patients": patients})
 
 #definir la date du jour dans le formulaire de constante
 def my_view(request):

@@ -9,20 +9,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   </head>
 <body class="constante_body">
+    {% csrf_token %}
 
     <div class="header-bar">
         <h1>Prise de constante</h1>
     </div>
 
     <div class="main-container">
-
         <div class="patient-info-box">
+            {% for patient in patients%}
             <div class="patient-details">
                 <i class="fas fa-user-circle profile-icon"></i>
-                <span class="patient-name">Nom Prénoms du patient</span>
-                <span class="patient-age">Âge</span>
+                <span class="patient-name">{{patient.nom}}{{patient.prenom}}</span>
+                <span class="patient-age">{{patient.sexe}}</span>
                 <span class="patient-sex">Sexe</span>
             </div>
+            {% endfor %}
         </div>
 
         <div class="content-area">
@@ -51,14 +53,15 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="submit" class="btn btn-vaccin" id="btnVaccin">Vaccin</button>
-                    <button type="submit" class="btn btn-nutrition" id="btnNutrition">Nutrition</button>
+                    <button type="submit" class="btn btn-vaccin" id="btnVaccin">Enregistrer</button>
+                    <!--<button type="submit" class="btn btn-nutrition" id="btnNutrition">Nutrition</button>-->
                 </div>
             </form>
 
-            <div class="note-info">
+            <!--<div class="note-info">
                 NB: Si le patient a un état normal, alors le bouton nutrition est grisé.
-            </div>
+            </div>-->
+            
         </div>
     </div>
 

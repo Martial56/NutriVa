@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+    <title>Formulaire Rendez-vous</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    {% csrf_token %}
+
+    <div class="container">
+        <div class="header">
+            <h1>Rendez-vous</h1>
+            </div>
+
+        <div class="dates">
+            <label for="datedebut">Date de début</label> <input type="date" name="datedebut" id="datedebut">
+            <label for="datefin">Date de fin</label> <input type="date" name="datefin" id="datefin">
+        </div>
+
+        <div class="list-title-container">
+            <span class="list-title">Liste</span>
+        </div>
+
+        <table class="appointment-table">
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>Nom et Prénoms patients</th>
+                    <th>État nutritionnel</th>
+                    <th colspan="2">action</th> </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>{{patient.date_naissance}}</td>
+                    <td>{{ patient.nom }} {{ patient.prenom }}</td>
+                    <td></td>
+                    <td colspan="2">
+                        <div class="action-cell">
+                            <button class="button vaccin-button">Vaccin</button>
+                            <button class="button nutrition-button">Nutrition</button>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+</body>
+</html>

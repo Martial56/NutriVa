@@ -702,6 +702,151 @@ body.nutrition-body {
     flex-direction: column;
   }
 }
+.etat_nutri {
+  width: 200px;          /* identique à tes autres inputs */
+  padding: 7px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+/************ style de la page rendez-vous *******************/
+
+/* Styles généraux 
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }*/
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* En-tête bleu */
+.header {
+    background-color: #004d99; /* Bleu foncé */
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #d1f7d1; /* Vert clair pour le titre */
+}
+
+/* Zone de dates */
+.dates {
+    padding: 10px 20px 5px;
+    text-align: right;
+    font-size: 14px;
+    color: #333;
+}
+
+.dates span {
+    margin-left: 30px;
+}
+
+/* Titre de la liste */
+.list-title-container {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    padding: 5px 0;
+    background-color: #f0f0f0; /* Fond gris clair */
+    margin-top: 10px;
+}
+
+.list-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Tableau de la liste */
+.appointment-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Pour fixer les largeurs */
+}
+
+.appointment-table th, .appointment-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+/* En-têtes du tableau (bleu) */
+.appointment-table th {
+    background-color: #0066cc; /* Bleu plus clair pour les TH */
+    color: white;
+    font-weight: bold;
+    border-color: #004d99;
+}
+
+/* Largeurs des colonnes */
+.appointment-table th:nth-child(1) { width: 15%; } /* DATE */
+.appointment-table th:nth-child(2) { width: 35%; } /* Nom et Prénoms patients */
+.appointment-table th:nth-child(3) { width: 20%; } /* État nutritionnel */
+.appointment-table th:nth-child(4) { width: 30%; text-align: center; } /* Action (couvre les deux colonnes) */
+
+/* Lignes (alternance de couleur) */
+.appointment-table tr:nth-child(odd) td {
+    background-color: #f9f9f9; /* Gris très clair */
+}
+
+.appointment-table tr:nth-child(even) td {
+    background-color: #ffffff; /* Blanc */
+}
+
+/* Colonne Action (pour les boutons) */
+.action-cell {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    border: none; /* Pas de bordure interne visible entre les boutons */
+}
+
+/* Styles des boutons simulés */
+.button {
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px; /* Coins arrondis */
+    min-width: 80px;
+}
+
+.vaccin-button {
+    background-color: #4CAF50; /* Vert */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.nutrition-button {
+    background-color: #ff8c00; /* Orange */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/************* style de la page enregistrement patient *******************/
+.container-enregistrement{
+    margin: 20px auto;
+}
+
 
 :root { color-scheme: light dark; }
 

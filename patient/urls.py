@@ -9,6 +9,7 @@ urlpatterns = [
     path('vaccination/', views.vaccination, name="vaccination"),
     path('login/', views.login, name="login"),
     path('nutrition/', views.nutrition, name="nutrition"),
+    path('rdv/', views.rdv, name="rdv"),
  # urls.py
     path("enregistrement_patient/", views.enregistrement_patient, name="enregistrement_patient")
 
