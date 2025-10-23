@@ -17,21 +17,20 @@
 
     <div class="main-container">
         <div class="patient-info-box">
-            {% for patient in patients%}
             <div class="patient-details">
                 <i class="fas fa-user-circle profile-icon"></i>
-                <span class="patient-name">{{patient.nom}}{{patient.prenom}}</span>
-                <span class="patient-age">{{patient.sexe}}</span>
-                <span class="patient-sex">Sexe</span>
+                <span class="patient-name">{{patient.nom}} {{patient.prenom}}</span>
+                <span class="patient-age">{{patient.age}} Mois</span>
+                <span class="patient-sex">{{patient.sexe}}</span>
             </div>
-            {% endfor %}
         </div>
 
         <div class="content-area">
-            <form class="constants-form">
+            <form class="constants-form" method="post" action="{% url 'enregistrement_constante' patient.id %}">
+                {% csrf_token %}
                 <div class="form-grid">
                     <label for="date">Date</label>
-                    <input type="date" id="date" name="date">
+                    <input type="date" id="date" name="date" value="{{ today|date:'Y-m-d' }}">
 
                     <label for="taille">Taille</label>
                     <input type="text" id="taille" name="taille" inputmode="numeric" maxlength="3" pattern="[0-9]*">
@@ -53,7 +52,7 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="submit" class="btn btn-vaccin" id="btnVaccin">Enregistrer</button>
+                    <a href="{% url 'rdv'%}"><button type="submit" class="btn btn-vaccin" id="btnVaccin">Enregistrer</button></a>
                     <!--<button type="submit" class="btn btn-nutrition" id="btnNutrition">Nutrition</button>-->
                 </div>
             </form>

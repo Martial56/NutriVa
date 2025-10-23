@@ -21,9 +21,9 @@
   <section class="patient-info">
     <i class="fas fa-user-circle patient-icon"></i>
     <div class="patient-details">
-      <span class="patient-name"><strong>Nom Prénoms du patient</strong></span>
-      <span class="patient-age">Âge</span>
-      <span class="patient-sex">Sexe</span>
+      <span class="patient-name"><strong>{{patient.nom}} {{patient.prenom}}</strong></span>
+      <span class="patient-age">{{patient.age}}</span>
+      <span class="patient-sex">{{patient.sexe}}</span>
     </div>
   </section>
 
@@ -33,7 +33,7 @@
     <div class="form-section info-box">
       <div class="form-group">
         <label for="code_unique">Code unique</label>
-        <input type="text" id="code_unique" name="code_unique">
+        <input type="text" id="code_unique" name="code_unique" value="{{ code }}" readonly>
       </div>
       <div class="form-group">
         <label for="date_admission">Date d’admission</label>

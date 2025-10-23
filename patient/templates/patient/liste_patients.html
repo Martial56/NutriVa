@@ -26,7 +26,7 @@
                 <a href="{% url 'creer_patient' %}">
                     <img src="{% static 'images/ajouter.png' %}" class="icon-img" alt="Ajouter" title="Nouveau patient">
                 </a>
-                <a href="{% url 'constante' %}">
+                <a href="#">
                     <img src="{% static 'images/medical.png' %}" class="icon-img" alt="Constante" title="Constantes">
                 </a>
                 <a href="#">
@@ -49,11 +49,12 @@
             <div class="patient-card kanban">
                 <img src="{% static 'images/person.png' %}" alt="Photo du patient" class="img-fluid rounded-circle" width="90" height="90">
                 <div class="patient-name">{{ patient.nom }} {{ patient.prenom }}</div>
-                <div class="text-muted small">{{ patient.date_naissance }}</div>
+                <div class="text-muted small">{{ patient.age }} Mois</div>
+                <div class="text-muted small">{{ patient.sexe }}</div>
                 <div>{{ patient.quartier }}</div>
                 <div>{{ patient.telephone }}</div>
                 <div class="mt-2">
-                    <a href="{% url 'constante' %}"><button class="btn btn-sm btn-secondary">Prise de constante</button></a>
+                    <a href="{% url 'constante' patient.id %}"><button class="btn btn-sm btn-secondary">Prise de constante</button></a>
                 </div>
             </div>
         </div>

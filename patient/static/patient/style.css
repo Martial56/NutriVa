@@ -722,7 +722,7 @@ body.nutrition-body {
         }*/
 
 .container {
-    max-width: 1000px;
+    /*max-width: 1000px;*/
     margin: 0 auto;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -776,13 +776,16 @@ body.nutrition-body {
 .appointment-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Pour fixer les largeurs */
+    /* Maintient la cohérence des largeurs définies par les TH */
+    table-layout: fixed; 
 }
 
 .appointment-table th, .appointment-table td {
     padding: 10px;
     border: 1px solid #ddd;
     text-align: left;
+    /* S'assure que le padding n'interfère pas avec la largeur fixe */
+    box-sizing: border-box; 
 }
 
 /* En-têtes du tableau (bleu) */
@@ -793,11 +796,16 @@ body.nutrition-body {
     border-color: #004d99;
 }
 
-/* Largeurs des colonnes */
-.appointment-table th:nth-child(1) { width: 15%; } /* DATE */
-.appointment-table th:nth-child(2) { width: 35%; } /* Nom et Prénoms patients */
-.appointment-table th:nth-child(3) { width: 20%; } /* État nutritionnel */
-.appointment-table th:nth-child(4) { width: 30%; text-align: center; } /* Action (couvre les deux colonnes) */
+/* Largeurs des 7 colonnes pour totaliser 100% */
+.appointment-table th:nth-child(1) { width: 10%; } /* 1. Date */
+.appointment-table th:nth-child(2) { width: 20%; } /* 2. Nom et Prénoms patients */
+.appointment-table th:nth-child(3) { width: 15%; } /* 3. État nutritionnel */
+.appointment-table th:nth-child(4) { width: 15%; } /* 4. Apports nutritionnel */
+.appointment-table th:nth-child(5) { width: 15%; } /* 5. Vaccins reçus */
+/* Les deux dernières colonnes d'action sont réduites pour faire de la place */
+.appointment-table th:nth-child(6) { width: 12.5%; text-align: center; } /* 6. Action Vaccin */
+.appointment-table th:nth-child(7) { width: 8.5%; text-align: center; } /* 7. Action Nutrition */
+
 
 /* Lignes (alternance de couleur) */
 .appointment-table tr:nth-child(odd) td {
@@ -808,28 +816,33 @@ body.nutrition-body {
     background-color: #ffffff; /* Blanc */
 }
 
-/* Colonne Action (pour les boutons) */
-.action-cell {
+/* Suppression de .action-cell - nous stylisons directement les TD d'action */
+/* Centre le contenu des deux dernières colonnes (boutons) */
+.appointment-table td:nth-child(6),
+.appointment-table td:nth-child(7) {
+    text-align: center;
+    /* Utilise flexbox pour un meilleur contrôle du bouton dans la cellule */
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     height: 100%;
-    border: none; /* Pas de bordure interne visible entre les boutons */
 }
 
-/* Styles des boutons simulés */
+/* Styles des boutons */
 .button {
     border: none;
     color: white;
-    padding: 8px 15px;
+    padding: 6px 8px; /* Réduit le padding pour s'adapter à la petite largeur */
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
+    font-size: 12px; /* Réduit la police */
+    /* Assure que le bouton ne prend pas toute la largeur de la cellule */
+    max-width: 90%; 
     cursor: pointer;
     border-radius: 5px; /* Coins arrondis */
-    min-width: 80px;
+    /* Suppression du margin horizontal pour gagner de la place */
+    margin: 4px 0; 
 }
 
 .vaccin-button {

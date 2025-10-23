@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
-    {% load static %}
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'patient/style.css' %}">
     <title>Formulaire Rendez-vous</title>
-    <style>
-        
-    </style>
 </head>
 <body>
-    {% csrf_token %}
 
     <div class="container">
         <div class="header">
             <h1>Rendez-vous</h1>
-            </div>
-
-        <div class="dates">
-            <label for="datedebut">Date de début</label> <input type="date" name="datedebut" id="datedebut">
-            <label for="datefin">Date de fin</label> <input type="date" name="datefin" id="datefin">
         </div>
+
+        <form method="get" action="{% url 'liste_rdv' %}">
+            {% csrf_token %}
+            <div class="dates">
+                <label for="datedebut">Date de début</label>
+                <input type="date" name="datedebut" id="datedebut" value="{{ date_debut|default:today|date:'Y-m-d' }}">
+                <label for="datefin">Date de fin</label>
+                <input type="date" name="datefin" id="datefin" value="{{ date_fin|default:today|date:'Y-m-d' }}">
+                <button type="submit" class="button">Filtrer</button>
+            </div>
+        </form>
 
         <div class="list-title-container">
             <span class="list-title">Liste</span>
@@ -30,30 +32,34 @@
         <table class="appointment-table">
             <thead>
                 <tr>
-                    <th>DATE</th>
+                    <th>Date</th>
                     <th>Nom et Prénoms patients</th>
                     <th>État nutritionnel</th>
-                    <th colspan="2">action</th> </tr>
+                    <th>Apports nutritionnel</th>
+                    <th>Vaccins reçus</th>
+                    <th>Action</th> 
+                </tr>
             </thead>
             <tbody>
-                {% for patient in patients %}
+                {% for d in data %}
                 <tr>
-                    <td>{{patient.date_naissance}}</td>
-                    <td>{{ patient.nom }} {{ patient.prenom }}</td>
-                    <td></td>
-                    <td colspan="2">
-                        <div class="action-cell">
-                            <button class="button vaccin-button">Vaccin</button>
-                            <button class="button nutrition-button">Nutrition</button>
-                        </div>
+                    <td>{{ d.constante.date|date:"d/m/Y"|default:"-" }}</td>
+                    <td>{{ d.patient.nom }} {{ d.patient.prenom }}</td>
+                    <td>{{ d.nutrition.etat_nutri|default:"-" }}</td>
+                    <td>{{ d.nutrition.apport_nutri|default:"-" }}</td>
+                    <td>{{ d.vaccination.vaccin|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'vaccination' d.patient.id %}"><button class="button vaccin-button">Vaccin</button></a>
+                        <a href="{% url 'nutrition' d.patient.id %}"><button class="button nutrition-button">Nutrition</button></a>
                     </td>
                 </tr>
-
+                
+                {% empty %}
+                    <tr><td colspan="7">Aucun patient trouvé.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
 
 </body>
 </html>
