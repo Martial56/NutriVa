@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 #from .forms import PatientForm
+from django.db.models import Q
 from django.http import HttpResponse
 from .models import Patient, Constante, Vaccination, Rdv, Nutrition
 from datetime import datetime, date
@@ -32,16 +33,34 @@ def vaccination(request, patient_id):
 # la vue pour la page nutrition
 def nutrition(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
-    return render(request, 'patient/nutrition.html', {"patient_id": patient_id})
+    nutrition = Nutrition.objects.filter(patient=patient).first()
+    
+    context = {
+        "patient": patient,
+        "nutrition": nutrition,
+    }
+    return render(request, 'patient/nutrition.html', context)
 
 #la vue pour la page de liste des patients
 def liste_patients(request):
     patients = Patient.objects.all()
     return render(request, "patient/liste_patients.html", {"patients": patients})
 
-#definir la date du jour dans le formulaire de constante
-def my_view(request):
-    return render(request, {"today": date.today()})
+# bouton rechercher dans la liste des patients
+def rechercher_patients(request):
+    query = request.GET.get('search')
+    patients = Patient.objects.all()
+    if query:
+        
+        patients = Patient.objects.filter(
+            Q(nom__icontains=query) |
+            Q(prenom__icontains=query)|
+            Q(telephone__icontains=query)
+        ).distinct()
+    context = {
+        "patients": patients,
+        "query": query,}
+    return render(request, "patient/liste_patients.html", context)
 
 #Bouton enregistrer de la page création de patient
 def enregistrement_patient(request):
@@ -130,8 +149,8 @@ def liste_rdv(request):
     patients = Patient.objects.filter(id__in=patients_ids)
 
     # 🔹 Récupérer les nutritions et vaccinations liées à ces patients
-    nutritions = Nutrition.objects.filter(patient_id__in=patients_ids)
-    vaccinations = Vaccination.objects.filter(patient_id__in=patients_ids)
+    nutritions = Nutrition.objects.filter(patient_id__in=patients_ids, date_visite__range=[date_debut, date_fin])
+    vaccinations = Vaccination.objects.filter(patient_id__in=patients_ids, date__range=[date_debut, date_fin])
 
     # 🔹 Construire la structure de données à afficher
     data = []
@@ -156,3 +175,70 @@ def liste_rdv(request):
     }
 
     return render(request, 'patient/rdv.html', context)
+
+#enregistrement des vaccinations
+def enregistrement_vaccin(request, patient_id):
+    if request.method == "POST":
+        vaccins = request.POST.getlist('vaccins')  # récupère tous les vaccins cochés
+        patient = get_object_or_404(Patient, id=patient_id)
+        date_vaccin = date.today()
+
+        #for v in vaccins:
+        Vaccination.objects.create(
+            patient=patient,
+            date=date_vaccin,
+            vaccin=vaccins,
+        )
+        return redirect('rdv')  # ou 'liste_patients', selon ta page de retour
+
+    return render(request, 'patient/vaccination.html')
+
+# enregistrement des infos d'admission en nutrition
+def enregistrement_nutrition(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+    
+    # On vérifie s’il existe déjà une donnée Nutrition pour ce patient
+    nutrition = Nutrition.objects.filter(patient=patient).first()
+
+    if request.method == "POST":
+        date_admission = request.POST.get("date_admission")
+        etat_nutri = request.POST.get("etat_nutri")
+        date_sortie = request.POST.get("date_sortie") or None
+        motif_sortie = request.POST.get("motif_sortie") or None
+
+        code_unique = f"NUT-{date.today().year}-{Nutrition.id}+1"
+        date_visite = date.today()
+        if nutrition:
+            # Mise à jour
+            nutrition.code_nutrition = code_unique
+            nutrition.date_admission = date_admission
+            nutrition.date_visite=date_visite
+            nutrition.etat_nutrition = etat_nutri
+            nutrition.date_sortie = date_sortie
+            nutrition.motif_sortie = motif_sortie
+            nutrition.save()
+        else:
+            # Création
+            Nutrition.objects.create(
+                patient=patient,
+                code_nutrition=code_unique,
+                date_admission=date_admission,
+                date_visite=date_visite,
+                etat_nutrition=etat_nutri,
+                date_sortie=date_sortie,
+                motif_sortie=motif_sortie,
+            )
+
+        return redirect("rdv")  # redirection après enregistrement
+
+    # Préparer les données à envoyer au template
+    #context = {
+    #    "patient": patient,
+     #   "code": nutrition.code_nutrition if nutrition else f"NUT-{patient.id:05d}",
+     #   "date_admission": nutrition.date_admission if nutrition else "",
+     #   "etat_nutri": nutrition.etat_nutri if nutrition else "",
+      #  "date_sortie": nutrition.date_sortie if nutrition else "",
+      #  "motif_sortie": nutrition.motif_sortie if nutrition else "",
+    #}
+
+    return render(request, "patient/nutrition.html")

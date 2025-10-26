@@ -15,9 +15,9 @@
     <nav class="header-bar-liste"> <!--navbar bg-light mb-4 px-3-->
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <!-- Recherche -->
-            <form class="d-flex w-50" method="post" action="">
+            <form class="d-flex w-50" method="get" action="{% url 'rechercher_patients' %}">
                 {% csrf_token %}
-                <input type="search" name="search" class="form-control me-2" placeholder="Rechercher un patient…" aria-label="Recherche">
+                <input type="search" name="search" class="form-control me-2" placeholder="Rechercher un patient…" aria-label="Recherche"value="{{ query|default:'' }}">
                 <button class="btnrecherche" type="submit">Rechercher</button>
             </form>
 

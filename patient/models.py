@@ -53,12 +53,12 @@ class Vaccination(models.Model):
     
 class Nutrition(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    code_unique = models.CharField(max_length=100)
+    code_nutrition = models.CharField(max_length=100)
     date_visite = models.DateField()
     date_admission = models.DateField()
-    date_sortie = models.DateField()
+    date_sortie = models.DateField(null=True, blank=True) 
     etat_nutrition = models.CharField(max_length=500)
-    #status = models.CharField(max_length=500)  nouveau, en cours, sortant
+    motif_sortie = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"Nutrition {self.etat_nutrition} de {self.patient} le {self.date_visite}"

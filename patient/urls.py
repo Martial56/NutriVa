@@ -12,8 +12,12 @@ urlpatterns = [
     path('rdv/', views.rdv, name="rdv"),
     path('liste_rdv/', views.liste_rdv, name="liste_rdv"),
  # urls.py
+    path('rechercher_patients/', views.rechercher_patients, name="rechercher_patients"),
+ 
     path("enregistrement_patient/", views.enregistrement_patient, name="enregistrement_patient"),
     path('enregistrement_constante/<int:patient_id>/', views.enregistrement_constante, name='enregistrement_constante'),
+    path('enregistrement_vaccin/<int:patient_id>/', views.enregistrement_vaccin, name='enregistrement_vaccin'),
+    path('enregistrement_nutrition/<int:patient_id>/', views.enregistrement_nutrition, name='enregistrement_nutrition'),
 
     
 ]

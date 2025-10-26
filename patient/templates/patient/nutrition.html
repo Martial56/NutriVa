@@ -10,85 +10,98 @@
 </head>
 <body class="nutrition-body">
 
-  <header class="header-bar-nutrition">
-    <h1>Rendez-vous nutritionnel</h1>
-    <div class="header-buttons">
-      <button class="btn btn-cancel">Annuler</button>
-      <button class="btn btn-save">Enregistrer</button>
+  <div class="header-bar-vaccin">
+        <h1>Rendez-vous nutritionnel</h1>
+        <div class="header-buttons">
+            <button class="btn btn-annuler">Annuler</button>
+            <button class="btn btn-enregistrer" form="formapport_nutrition" type="submit">Enregistrer</button>
+        </div>
     </div>
-  </header>
 
-  <section class="patient-info">
-    <i class="fas fa-user-circle patient-icon"></i>
+  <div class="patient-info-box">
     <div class="patient-details">
-      <span class="patient-name"><strong>{{patient.nom}} {{patient.prenom}}</strong></span>
-      <span class="patient-age">{{patient.age}}</span>
-      <span class="patient-sex">{{patient.sexe}}</span>
+        <i class="fas fa-user-circle profile-icon"></i>
+        <span class="patient-name">{{patient.nom}} {{patient.prenom}}</span>
+        <span class="patient-age">{{patient.age}} ans</span>
+        <span class="patient-sex">{{patient.sexe}}</span>
     </div>
-  </section>
+</div>
 
   <main class="nutrition-form-container">
-
-    <!-- Bloc Informations générales -->
-    <div class="form-section info-box">
-      <div class="form-group">
-        <label for="code_unique">Code unique</label>
-        <input type="text" id="code_unique" name="code_unique" value="{{ code }}" readonly>
-      </div>
-      <div class="form-group">
-        <label for="date_admission">Date d’admission</label>
-        <input type="date" id="date_admission" name="date_admission">
-      </div>
-      <div class="form-group">
-        <label for="etat_nutri">État nutritionnel</label>
-        <select id="etat_nutri" name="etat_nutri" class="etat_nutri">
-            <option value=""></option>
-            <option value="normal">Normal</option>
-            <option value="modere">Modéré</option> 
-            <option value="severe">Sévère sans complication</option>
-            <option value="severe_comp">Sévère avec complication</option>
-            <option value="surpoids">Surpoids</option>
-            <option value="obeisite">Obésité</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="date_sortie">Date de sortie</label>
-        <input type="date" id="date_sortie" name="date_sortie">
-      </div>
-      <div class="form-group btn-right">
-        <button class="btn btn-save">Enregistrer</button>
-      </div>
-    </div>
-
-    <!-- Bloc Dépistage et Produits -->
-    <div class="form-row">
-
-      <!-- Dépistage -->
-      <div class="form-section depistage-box">
-        <p><strong>Dépisté</strong></p>
-        <label><input type="radio" name="depiste" value="oui"> Oui</label>
-        <label><input type="radio" name="depiste" value="non"> Non</label>
-
+    <form action="{% url 'enregistrement_nutrition' patient.id %}" method="post">
+      {% csrf_token %}
+      <!-- Bloc Informations générales -->
+      <div class="form-section info-box">
         <div class="form-group">
-          <label for="code_depistage">Code de dépistage</label>
-          <input type="text" id="code_depistage" name="code_depistage" placeholder="ex: 09817/01/01/25/00001">
+          <label for="code_unique">Code unique</label>
+          <input type="text" id="code_unique" name="code_unique" value="{{ nutrition.code_nutrition|default_if_none:'' }}" readonly>
+        </div>
+        <div class="form-group">
+          <label for="date_admission">Date d’admission</label>
+          <input type="date" id="date_admission" name="date_admission" value="{{ nutrition.date_admission|date:'Y-m-d' }}">
+        </div>
+        <div class="form-group">
+          <label for="etat_nutri">État nutritionnel</label>
+          <select id="etat_nutri" name="etat_nutri" class="etat_nutri">
+              <option value=""></option>
+              <option value="normal" {% if nutrition.etat_nutri == 'normal' %}selected{% endif %}>Normal</option>
+              <option value="modere" {% if nutrition.etat_nutri == 'modere' %}selected{% endif %}>Modéré</option>
+              <option value="severe_sans_comp" {% if nutrition.etat_nutri == 'severe_sans_comp' %}selected{% endif %}>Sévère sans complication</option>
+              <option value="severe_avec_comp" {% if nutrition.etat_nutri == 'severe_avec_comp' %}selected{% endif %}>Sévère avec complication</option>
+              <option value="surpoids" {% if nutrition.etat_nutri == 'surpoids' %}selected{% endif %}>Surpoids</option>
+              <option value="obeisite" {% if nutrition.etat_nutri == 'obeisite' %}selected{% endif %}>Obésité</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="date_sortie">Date de sortie</label>
+          <input type="date" id="date_sortie" name="date_sortie" value="{{ nutrition.date_sortie|date:'Y-m-d' }}">
+        </div>
+        <div class="form-group">
+          <label for="motif_sortie">Motif de sortie</label>
+          <select id="motif_sortie" name="motif_sortie" class="etat_nutri">
+              <option value=""></option>
+              <option value="gueris" {% if nutrition.motif_sortie == 'gueris' %}selected{% endif %}>Guéri</option>
+              <option value="abandon" {% if nutrition.motif_sortie == 'abandon' %}selected{% endif %}>Abandon</option>
+              <option value="deces" {% if nutrition.motif_sortie == 'deces' %}selected{% endif %}>Décès</option>
+          </select>
+        </div>
+        <div class="form-group btn-right">
+          <button class="btn btn-save" type="submit">Enregistrer</button>
+        </div>
+      </div>
+    </form>
+    <form id= "formapport_nutrition" method="post" action="">
+      {%csrf_token%}
+      <!-- Bloc Dépistage et Produits -->
+      <div class="form-row">
+
+        <!-- Dépistage -->
+        <div class="form-section depistage-box">
+          <p><strong>Dépisté</strong></p>
+          <label><input type="radio" name="depiste" value="oui"> Oui</label>
+          <label><input type="radio" name="depiste" value="non"> Non</label>
+
+          <div class="form-group">
+            <label for="code_depistage">Code de dépistage</label>
+            <input type="text" id="code_depistage" name="code_depistage" placeholder="ex: 09817/01/01/25/00001">
+          </div>
+
+          <p><strong>Résultat de dépistage</strong></p>
+          <label><input type="radio" name="resultat" value="positif"> Positif</label>
+          <label><input type="radio" name="resultat" value="negatif"> Négatif</label>
         </div>
 
-        <p><strong>Résultat de dépistage</strong></p>
-        <label><input type="radio" name="resultat" value="positif"> Positif</label>
-        <label><input type="radio" name="resultat" value="negatif"> Négatif</label>
-      </div>
+        <!-- Produits -->
+        <div class="form-section produits-box">
+          <label><input type="checkbox" name="produits" value="lait"> Lait</label><br>
+          <label><input type="checkbox" name="produits" value="plumpy"> Plumpy Nut</label><br>
+          <label><input type="checkbox" name="produits" value="deparasitant"> Déparasitant</label><br>
+          <label><input type="checkbox" name="produits" value="vitA100"> Vitamine A100</label><br>
+          <label><input type="checkbox" name="produits" value="vitA200"> Vitamine A200</label>
+        </div>
 
-      <!-- Produits -->
-      <div class="form-section produits-box">
-        <label><input type="checkbox" name="produits" value="lait"> Lait</label><br>
-        <label><input type="checkbox" name="produits" value="plumpy"> Plumpy Nut</label><br>
-        <label><input type="checkbox" name="produits" value="deparasitant"> Déparasitant</label><br>
-        <label><input type="checkbox" name="produits" value="vitA100"> Vitamine A100</label><br>
-        <label><input type="checkbox" name="produits" value="vitA200"> Vitamine A200</label>
       </div>
-
-    </div>
+    </form>
   </main>
 </body>
 </html>
