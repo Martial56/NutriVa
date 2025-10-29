@@ -70,7 +70,7 @@
         </div>
       </div>
     </form>
-    <form id= "formapport_nutrition" method="post" action="">
+    <form id= "formapport_nutrition" method="post" action="{% url 'enregistrer_apport_nutrition' patient.id %}">
       {%csrf_token%}
       <!-- Bloc Dépistage et Produits -->
       <div class="form-row">

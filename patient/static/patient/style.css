@@ -73,12 +73,12 @@ li a:hover{
 
 /************ style de la pâge connexion**********************/
 .login-body {
-    /* Fond violet similaire à l'image */
-    background-color: #6a3e9c; 
+    /* Fond violet similaire à l'image 
+    background-color: #6a3e9c; */
     
-    /* background-image: url('chemin/vers/votre/image.jpg'); 
+    background-image: url('../images/image_seringue.png'); 
     background-size: cover;
-    background-position: center; */
+    background-position: center; 
     
     display: flex;
     justify-content: center;
@@ -331,7 +331,8 @@ input::placeholder {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .kanban{
-    margin: 10%;
+    margin-top: 5%;
+    
 }
 .icon-img {
     width: 40px;

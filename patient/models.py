@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.utils import timezone
 
 class Patient(models.Model):
     nom = models.CharField(max_length=100)
@@ -24,7 +25,7 @@ class Constante(models.Model):
     date = models.DateField()
     poids = models.FloatField()
     taille = models.FloatField()
-    perimetre_brachial = models.FloatField()
+    perimetre_brachial = models.FloatField(null=True, blank=True)
     zscore = models.FloatField()
     #tension = models.CharField(max_length=20)
     imc = models.FloatField()
@@ -64,17 +65,41 @@ class Nutrition(models.Model):
         return f"Nutrition {self.etat_nutrition} de {self.patient} le {self.date_visite}"
     
 class Rdv(models.Model):
+    RESULTAT_CHOICES = [
+        ("positif", "Positif"),
+        ("negatif", "Négatif"),
+    ]
+
+    DEPISTE_CHOICES = [
+        ("oui", "Oui"),
+        ("non", "Non"),
+    ]
+
+    PRODUITS_CHOICES = [
+        ("lait", "Lait"),
+        ("plumpy", "Plumpy Nut"),
+        ("deparasitant", "Déparasitant"),
+        ("vitA100", "Vitamine A100"),
+        ("vitA200", "Vitamine A200"),
+    ]
+
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    vaccination = models.ForeignKey(Vaccination, on_delete=models.CASCADE)
-    nutrition = models.ForeignKey(Nutrition, on_delete=models.CASCADE)
-    date = models.DateField()
-    depistage = models.CharField(max_length=100)
-    codedepistage = models.TextField()
-    resultattest = models.TextField()
-    vitamina_dose1 = models.TextField()
-    vitamina_dose2 = models.TextField()
-    plumpynut = models.TextField()
-    deparasitant = models.TextField()
+    depiste = models.CharField(max_length=5, choices=DEPISTE_CHOICES)
+    code_depistage = models.CharField(max_length=50, blank=True, null=True)
+    resultat = models.CharField(max_length=10, choices=RESULTAT_CHOICES, blank=True, null=True)
+    produits = models.JSONField(default=list)  # pour enregistrer plusieurs produits
+    date_enregistrement = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Service {self.type_service} de {self.patient} le {self.date}"
+        return f"Rapport nutrition - {self.patient.nom} {self.patient.prenom}"
+
+    def produits_list(self):
+       # Créer un dictionnaire de mapping clé -> libellé pour une recherche facile
+        choices_dict = dict(self.PRODUITS_CHOICES)
+        
+        # Mapper chaque clé (ex: "lait") dans self.produits à son libellé (ex: "Lait")
+        # Si une clé n'est pas trouvée (ce qui ne devrait pas arriver), utiliser la clé elle-même
+        produits_libelles = [choices_dict.get(key, key) for key in self.produits]
+
+        # Joindre les libellés par une virgule pour l'affichage
+        return ", ".join(produits_libelles) if produits_libelles else "-"

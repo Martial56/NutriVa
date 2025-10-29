@@ -45,8 +45,8 @@
                 <tr>
                     <td>{{ d.constante.date|date:"d/m/Y"|default:"-" }}</td>
                     <td>{{ d.patient.nom }} {{ d.patient.prenom }}</td>
-                    <td>{{ d.nutrition.etat_nutri|default:"-" }}</td>
-                    <td>{{ d.nutrition.apport_nutri|default:"-" }}</td>
+                    <td>{{ d.nutrition.etat_nutrition|default:"-" }}</td>
+                    <td>{{ d.rdv.produits_list }}</td>
                     <td>{{ d.vaccination.vaccin|default:"-" }}</td>
                     <td>
                         <a href="{% url 'vaccination' d.patient.id %}"><button class="button vaccin-button">Vaccin</button></a>

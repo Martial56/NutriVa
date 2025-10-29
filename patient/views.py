@@ -151,6 +151,7 @@ def liste_rdv(request):
     # 🔹 Récupérer les nutritions et vaccinations liées à ces patients
     nutritions = Nutrition.objects.filter(patient_id__in=patients_ids, date_visite__range=[date_debut, date_fin])
     vaccinations = Vaccination.objects.filter(patient_id__in=patients_ids, date__range=[date_debut, date_fin])
+    rdvs = Rdv.objects.filter(patient_id__in=patients_ids, date_enregistrement__range=[date_debut, date_fin])
 
     # 🔹 Construire la structure de données à afficher
     data = []
@@ -158,12 +159,14 @@ def liste_rdv(request):
         constante = constantes.filter(patient=patient).first()
         nutrition = nutritions.filter(patient=patient).first()
         vaccination = vaccinations.filter(patient=patient).first()
+        rdv = rdvs.filter(patient=patient).first()
 
         data.append({
             'patient': patient,
             'constante': constante,
             'nutrition': nutrition,
             'vaccination': vaccination,
+            'rdv': rdv,
         })
 
     # 🔹 Envoyer les données au template
@@ -206,7 +209,7 @@ def enregistrement_nutrition(request, patient_id):
         date_sortie = request.POST.get("date_sortie") or None
         motif_sortie = request.POST.get("motif_sortie") or None
 
-        code_unique = f"NUT-{date.today().year}-{Nutrition.id}+1"
+        code_unique = f"NUT-{date.today().year}-{str(Nutrition.objects.count() + 1).zfill(4)}",
         date_visite = date.today()
         if nutrition:
             # Mise à jour
@@ -242,3 +245,25 @@ def enregistrement_nutrition(request, patient_id):
     #}
 
     return render(request, "patient/nutrition.html")
+
+def enregistrer_apport_nutrition(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    if request.method == "POST":
+        depiste = request.POST.get("depiste") or None
+        code_depistage = request.POST.get("code_depistage") or None
+        resultat = request.POST.get("resultat") or None
+        produits = request.POST.getlist("produits") or None  # car c’est une liste de checkboxes
+
+        # Création du rapport
+        Rdv.objects.create(
+            patient=patient,
+            depiste=depiste,
+            code_depistage=code_depistage,
+            resultat=resultat,
+            produits=produits,
+        )
+
+        return redirect("rdv")  # après enregistrement
+
+    return render(request, "patient/nutrition.html", {"patient": patient})

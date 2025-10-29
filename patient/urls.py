@@ -18,6 +18,7 @@ urlpatterns = [
     path('enregistrement_constante/<int:patient_id>/', views.enregistrement_constante, name='enregistrement_constante'),
     path('enregistrement_vaccin/<int:patient_id>/', views.enregistrement_vaccin, name='enregistrement_vaccin'),
     path('enregistrement_nutrition/<int:patient_id>/', views.enregistrement_nutrition, name='enregistrement_nutrition'),
+    path('enregistrer_apport_nutrition/<int:patient_id>/', views.enregistrer_apport_nutrition, name='enregistrer_apport_nutrition'),
 
     
 ]
