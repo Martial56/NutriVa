@@ -1,9 +1,26 @@
 from django.shortcuts import render, redirect, get_object_or_404
 #from .forms import PatientForm
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from .models import Patient, Constante, Vaccination, Rdv, Nutrition
 from datetime import datetime, date
+import calendar
+import io
+from django.template.loader import render_to_string
+from django.utils import timezone
+
+
+try:
+    from docx import Document
+except:
+    Document = None
+
+try:
+    import weasyprint
+except:
+    weasyprint = None
+
+
 #la vue pour la page d'accueil
 def index(request):
     return render(request, 'patient/index.html')
@@ -267,3 +284,197 @@ def enregistrer_apport_nutrition(request, patient_id):
         return redirect("rdv")  # après enregistrement
 
     return render(request, "patient/nutrition.html", {"patient": patient})
+
+
+# Génération du rapport périodique
+
+def rapports(request):
+    # --- Récupération des dates depuis le formulaire ou par défaut sur le mois courant ---
+    today = timezone.localdate()
+    start_date_str = request.GET.get("date_debut")
+    end_date_str = request.GET.get("date_fin")
+
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return HttpResponseBadRequest("Format de date invalide (utiliser AAAA-MM-JJ)")
+    else:
+        # par défaut : le mois courant
+        start_date = today.replace(day=1)
+        last_day = calendar.monthrange(today.year, today.month)[1]
+        end_date = today.replace(day=last_day)
+
+    # --- Agrégations ---
+    constantes = Constante.objects.filter(date__range=(start_date, end_date)).select_related('patient')
+    vaccinations = Vaccination.objects.filter(date__range=(start_date, end_date)).select_related('patient')
+    rdvs = Rdv.objects.filter(date_enregistrement__date__range=(start_date, end_date)).select_related('patient')
+
+    # groupement d’âge
+    age_groups = {
+        "0-5": (0, 5),
+        "6-11": (6, 11),
+        "12-23": (12, 23),
+        "24-59": (24, 59),
+    }
+    peses = {g: {"M": 0, "F": 0, "TOTAL": 0} for g in age_groups}
+
+    for c in constantes:
+        age_mois = c.patient.age
+        sexe = c.patient.sexe[0].upper() if c.patient.sexe else "M"
+        if sexe not in ["M", "F"]:
+            sexe = "M"
+        for g, (low, high) in age_groups.items():
+            if low <= age_mois <= high:
+                peses[g][sexe] += 1
+                peses[g]["TOTAL"] += 1
+                break
+    total_peses = sum(p["TOTAL"] for p in peses.values())
+
+    # Vaccination
+    ANTIGEN_MAP = {
+        "BCG": ["bcg"],
+       # "Polio 0": ["polio0", "polio 0"],
+        "VPO 0": ["VPO0"],
+        "VPO 1": ["VPO1"],
+        "VPO 2": ["VPO2"],
+        "VPO 3": ["VPO3"],
+        "VPI 1": ["VPI1"],
+        "VPI 2": ["VPI2"],
+        "DTC 0": ["Dtc_HepB_Hib_0"],
+        "DTC 1": ["Dtc_HepB_Hib_1"],
+        "DTC 2": ["Dtc_HepB_Hib_2"],
+        "DTC 3": ["Dtc_HepB_Hib_3"],
+        "PCV 1": ["PCV1"],
+        "PCV 2": ["PCV2"],
+        "PCV 3": ["PCV3"],
+        "ROTA 1": ["rota1"],
+        "ROTA 2": ["rota2"],
+        "Rougeole 1": ["RR1"],
+        "Rougeole 2": ["RR2"],
+        "VAP 1": ["VAP1"],
+        "VAP 2": ["VAP2"],
+        "VAP 3": ["VAP3"],
+        "VAP 4": ["VAP4"],
+        "HPV ": ["HPV"],
+        "MEN A": ["MenA"],
+        "VAA": ["VAA"],
+        "Vaccin anti-meningocique": ["vam"],
+        "Enfant complètement vacciné": ["vam"],
+        "Enfant protégé à la naissance": ["epn"],
+        "Enfant ayant bénéficié de MILDA": ["eabmilda"],
+        "Vaccin anti-hépatite B": ["ahb"],
+        "Vaxigrip": ["Vaxigrip"],
+        "VAT 1": ["vat1"],
+        "VAT 2": ["vat2"],
+        "VAT 1er rappel": ["vatrap1"],
+        "VAT 2e rappel": ["vatrap2"],
+        "VAT 3e rappel": ["vatrap3"],
+    }
+    antigen_counts = {k: 0 for k in ANTIGEN_MAP.keys()}
+    for v in vaccinations:
+        val = v.vaccin.lower()
+        for key, patterns in ANTIGEN_MAP.items():
+            if any(p in val for p in patterns):
+                antigen_counts[key] += 1
+
+    # Produits
+    PRODUIT_KEYS = {
+        "lait": "Lait",
+        "plumpy": "Plumpy Nut",
+        "deparasitant": "Déparasitant",
+        "vitA100": "Vitamine A100",
+        "vitA200": "Vitamine A200",
+    }
+    produit_counts = {v: 0 for v in PRODUIT_KEYS.values()}
+    for r in rdvs:
+        for p in (r.produits or []):
+            label = PRODUIT_KEYS.get(p)
+            if label:
+                produit_counts[label] += 1
+
+    context = {
+        "date_debut": start_date,
+        "date_fin": end_date,
+        "peses": peses,
+        "total_peses": total_peses,
+        "vaccinations": vaccinations,
+        "antigen_counts": antigen_counts,
+        "produit_counts": produit_counts,
+        "rdv_count": rdvs.count(),
+    }
+
+    fmt = request.GET.get("format")
+    if fmt == "docx":
+        return _report_to_docx(context)
+    elif fmt == "pdf":
+        return _report_to_pdf(request, context)
+    elif fmt == "html_download":
+        html = render_to_string("patient/rapport.html", context)
+        response = HttpResponse(html, content_type="text/html")
+        response["Content-Disposition"] = f'attachment; filename="rapport_{start_date}_{end_date}.html"'
+        return response
+
+    return render(request, "patient/rapport.html", context)
+
+
+# Génération DOCX
+def _report_to_docx(context):
+    if Document is None:
+        return HttpResponseBadRequest("python-docx n'est pas installé.")
+    doc = Document()
+    doc.add_heading(f"Rapport du {context['date_debut']} au {context['date_fin']}", level=1)
+
+    doc.add_heading("Séances de pesée", level=2)
+    t = doc.add_table(rows=1, cols=4)
+    hdr = t.rows[0].cells
+    hdr[0].text = "Tranche"
+    hdr[1].text = "M"
+    hdr[2].text = "F"
+    hdr[3].text = "Total"
+    for g, c in context["peses"].items():
+        row = t.add_row().cells
+        row[0].text = g
+        row[1].text = str(c["M"])
+        row[2].text = str(c["F"])
+        row[3].text = str(c["TOTAL"])
+
+    doc.add_heading("Vaccinations", level=2)
+    t2 = doc.add_table(rows=1, cols=2)
+    t2.rows[0].cells[0].text = "Antigène"
+    t2.rows[0].cells[1].text = "Nombre"
+    for ag, n in context["antigen_counts"].items():
+        r = t2.add_row().cells
+        r[0].text = ag
+        r[1].text = str(n)
+
+    doc.add_heading("Produits distribués", level=2)
+    t3 = doc.add_table(rows=1, cols=2)
+    t3.rows[0].cells[0].text = "Produit"
+    t3.rows[0].cells[1].text = "Quantité"
+    for p, n in context["produit_counts"].items():
+        r = t3.add_row().cells
+        r[0].text = p
+        r[1].text = str(n)
+
+    bio = io.BytesIO()
+    doc.save(bio)
+    bio.seek(0)
+    response = HttpResponse(
+        bio.read(),
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+    response["Content-Disposition"] = f'attachment; filename="rapport_{context["date_debut"]}_{context["date_fin"]}.docx"'
+    return response
+
+
+# Génération PDF
+def _report_to_pdf(request, context):
+    if weasyprint is None:
+        return HttpResponseBadRequest("WeasyPrint non installé.")
+    html = render_to_string("patient/rapport.html", context)
+    pdf = weasyprint.HTML(string=html).write_pdf()
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="rapport_{context["date_debut"]}_{context["date_fin"]}.pdf"'
+    return response

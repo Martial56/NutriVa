@@ -13,6 +13,7 @@ urlpatterns = [
     path('liste_rdv/', views.liste_rdv, name="liste_rdv"),
  # urls.py
     path('rechercher_patients/', views.rechercher_patients, name="rechercher_patients"),
+    path("rapport/", views.rapports, name="rapport"),
  
     path("enregistrement_patient/", views.enregistrement_patient, name="enregistrement_patient"),
     path('enregistrement_constante/<int:patient_id>/', views.enregistrement_constante, name='enregistrement_constante'),
