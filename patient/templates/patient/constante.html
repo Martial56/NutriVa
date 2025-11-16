@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   </head>
 <body class="constante_body">
+    {% include 'patient/header.html' %}
     {% csrf_token %}
 
     <div class="header-bar">
@@ -104,7 +105,7 @@
                 btnNutrition.classList.remove('disabled');
                 break;
             case (zscoreValue > 2):
-                indicec.value = "Obésité";
+                indicec.value = "Obesite";
                 btnNutrition.classList.remove('disabled');
                 break;
             default:

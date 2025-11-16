@@ -2,13 +2,46 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Rapport Périodique</title>
+  <title>Rapport mensuel de vaccination et nutrition</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 4px;
+      text-align: center;
+    }
+    th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+    .header {
+      background: #f1f1f1;
+      text-align: center;
+      font-weight: bold;
+    }
+    .total-row {
+      font-weight: bold;
+      background: #e9ecef;
+    }
+    .black-row {
+      background: #000;
+      color: #fff;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body class="p-4">
+  {% include 'patient/header.html' %}
 <div class="container">
-  <h1>Rapport Périodique Vaccination & Nutrition</h1>
 
+  <h1 class="mb-4 text-center">Rapport Mensuel - Vaccination & Nutrition</h1>
+
+  <!-- Sélection de période -->
   <form method="get" class="row g-3 mb-4">
     <div class="col-md-3">
       <label for="date_debut" class="form-label">Date début</label>
@@ -19,31 +52,158 @@
       <input type="date" id="date_fin" name="date_fin" value="{{ date_fin|date:'Y-m-d' }}" class="form-control" required>
     </div>
     <div class="col-md-3 align-self-end">
-      <button type="submit" class="btn btn-primary">Afficher le rapport</button>
+      <button type="submit" class="btn btn-primary w-100">Afficher le rapport</button>
     </div>
   </form>
 
   {% if peses %}
-  <div class="mb-3">
+  <!-- Boutons de téléchargement -->
+  <div class="mb-3 text-end">
     <a class="btn btn-outline-success" href="?date_debut={{ date_debut|date:'Y-m-d' }}&date_fin={{ date_fin|date:'Y-m-d' }}&format=docx">Télécharger DOCX</a>
     <a class="btn btn-outline-danger" href="?date_debut={{ date_debut|date:'Y-m-d' }}&date_fin={{ date_fin|date:'Y-m-d' }}&format=pdf">Télécharger PDF</a>
     <a class="btn btn-outline-secondary" href="?date_debut={{ date_debut|date:'Y-m-d' }}&date_fin={{ date_fin|date:'Y-m-d' }}&format=html_download">Télécharger HTML</a>
   </div>
 
-  <h3>Séances de pesée ({{ date_debut }} → {{ date_fin }})</h3>
-  <table class="table table-bordered table-sm">
-    <thead><tr><th>Tranche</th><th>Masculin</th><th>Féminin</th><th>Total</th></tr></thead>
+  <!-- Tableau principal -->
+  <h3 class="text-center my-3">Evaluation nutritionnelle</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th rowspan="2" class="align-middle">SEXE</th>
+        <th colspan="2">0–5 mois</th>
+        <th colspan="2">6–11 mois</th>
+        <th colspan="2">12–23 mois</th>
+        <th colspan="2">24–59 mois</th>
+        <th colspan="2">Sous-total</th>
+        <th rowspan="2" class="align-middle">Total</th>
+        <th rowspan="2" class="align-middle">Total référé</th>
+      </tr>
+      <tr>
+        <th>M</th><th>F</th>
+        <th>M</th><th>F</th>
+        <th>M</th><th>F</th>
+        <th>M</th><th>F</th>
+        <th>M</th><th>F</th>
+      </tr>
+    </thead>
+
     <tbody>
-      {% for g, c in peses.items %}
-        <tr><td>{{ g }}</td><td>{{ c.M }}</td><td>{{ c.F }}</td><td>{{ c.TOTAL }}</td></tr>
-      {% endfor %}
+      <tr><td>Nombre d’enfants pesés</td>
+        {% for g, c in peses.items %}
+          <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_peses.M }}</td>
+        <td>{{ total_peses.F }}</td>
+        <td>{{ total_peses.TOTAL }}</td>
+      </tr>
+
+      <tr>
+        <td>Nombre d’enfants venus pour la première fois à une séance de vaccination</td>
+        {% for g, c in premieres_visites.items %}
+          <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_premieres_visites.M }}</td>
+        <td>{{ total_premieres_visites.F }}</td>
+        <td>{{ total_premieres_visites.TOTAL }}</td>
+      </tr>
+      <tr>
+        <td>Nombre d’enfants en surpoids</td>
+        {% for g, c in surpoids.items %}
+        <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_surpoids.M }}</td>
+        <td>{{ total_surpoids.F }}</td>
+        <td>{{ total_surpoids.TOTAL }}</td>
+      </tr>
+      <tr>
+        <td>Nombre d’enfants obèses (Obésité)</td>
+        {% for g, c in obeses.items %}
+            <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_obeses.M }}</td>
+        <td>{{ total_obeses.F }}</td>
+        <td>{{ total_obeses.TOTAL }}</td>
+      </tr>
+      <tr>
+        <td>Malnutrition aiguë modérée (MAM)</td>
+        {% for g, c in mam.items %}
+            <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_mam.M }}</td>
+        <td>{{ total_mam.F }}</td>
+        <td>{{ total_mam.TOTAL }}</td>
+      </tr>
+      <tr>
+        <td>Malnutrition aiguë sévère sans complication</td>
+        {% for g, c in mas.items %}
+        <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_mas.M }}</td>
+        <td>{{ total_mas.F }}</td>
+        <td>{{ total_mas.TOTAL }}</td>
+      </tr>
+      
+
+      <tr class="black-row fw-bold"><td colspan="13"><h4>Vaccination de routine</h4></td></tr>
+
+      <tr>
+        <td>Nombre d’enfants vus en séance de vaccination PEV de routine</td>
+
+        {% for g, c in pev_routine.items %}
+            <td>{{ c.M }}</td>
+            <td>{{ c.F }}</td>
+        {% endfor %}
+
+        <td>{{ total_pev_routine.M }}</td>
+        <td>{{ total_pev_routine.F }}</td>
+        <td>{{ total_pev_routine.TOTAL }}</td>
+      </tr>
+      <tr>
+        <td>Nombre d’enfants ayant reçu une MILDA en PEV</td>
+        {% for g, c in milda.items %}
+          <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_milda.M }}</td>
+        <td>{{ total_milda.F }}</td>
+        <td>{{ total_milda.TOTAL }}</td>
+      </tr>
+
+      <tr>
+        <td>Nombre d’enfants dépistés au PEV</td>
+        {% for g, c in depistes.items %}
+          <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_depistes.M }}</td>
+        <td>{{ total_depistes.F }}</td>
+        <td>{{ total_depistes.TOTAL }}</td>
+      </tr>
+
+      <tr>
+        <td>Nombre d’enfants dépistés et déclarés positifs au PEV</td>
+        {% for g, c in positifs.items %}
+          <td>{{ c.M }}</td><td>{{ c.F }}</td>
+        {% endfor %}
+        <td>{{ total_positifs.M }}</td>
+        <td>{{ total_positifs.F }}</td>
+        <td>{{ total_positifs.TOTAL }}</td>
+      </tr>
+
+      <tr class="black-row">
+        <td>Total des mères venues pour la première fois aux activités (Ne pas compter la même personne deux fois)</td>
+        <td colspan="12"></td>
+      </tr>
     </tbody>
-    <tfoot><tr><th colspan="3">Total</th><th>{{ total_peses }}</th></tr></tfoot>
   </table>
 
-  <h3>Vaccinations</h3>
-  <table class="table table-sm table-striped">
-    <thead><tr><th>Antigène</th><th>Nombre</th></tr></thead>
+  <!-- Section Vaccinations -->
+  <h3 class="mt-5">Détails des vaccinations effectuées</h3>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Antigène</th>
+        <th>Nombre d’enfants vaccinés</th>
+      </tr>
+    </thead>
     <tbody>
       {% for ag, n in antigen_counts.items %}
         <tr><td>{{ ag }}</td><td>{{ n }}</td></tr>
@@ -51,18 +211,171 @@
     </tbody>
   </table>
 
-  <h3>Produits distribués</h3>
-  <table class="table table-sm table-striped">
-    <thead><tr><th>Produit</th><th>Quantité</th></tr></thead>
+  <!-- Section Produits distribués -->
+  <h3 class="mt-5">Produits nutritionnels distribués</h3>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Produit</th>
+        <th>Quantité distribuée</th>
+      </tr>
+    </thead>
     <tbody>
       {% for p, n in produit_counts.items %}
         <tr><td>{{ p }}</td><td>{{ n }}</td></tr>
       {% endfor %}
     </tbody>
   </table>
+  <table class="table table-bordered text-center">
+
+    <!-- ======================== TITRE SECTION ======================== -->
+    <tr class="table-secondary fw-bold">
+        <td colspan="21">PRISE EN CHARGE DE LA MALNUTRITION AIGUË</td>
+    </tr>
+
+    <!-- ======================== EN-TÊTE DES ÂGES ======================== -->
+    <tr>
+        <td rowspan="2" class="fw-bold">Indicateurs</td>
+        <td colspan="2">0-5 mois</td>
+        <td colspan="2">6-11 mois</td>
+        <td colspan="2">12-23 mois</td>
+        <td colspan="2">24-59 mois</td>
+        <td colspan="2">5-9 ans</td>
+        <td colspan="2">10-14 ans</td>
+        <td colspan="2">15-19 ans</td>
+        <td colspan="2">20-24 ans</td>
+        <td colspan="2">25 ans et plus</td>
+        <td colspan="2">Sous total</td>
+    </tr>
+    <tr>
+        {% for i in "1234567891" %}
+            <td>M</td><td>F</td>
+        {% endfor %}
+    </tr>
+
+    <!-- ======================== 1. MALNUTRITION SANS COMPLICATION ======================== -->
+    <tr>
+        <td>Nombre de malnutris sans complication pris en charge</td>
+        {% for g, c in mas_pris.items %}
+            <!--{% if g != "TOTAL" %}-->
+                <td>{{ c.M }}</td><td>{{ c.F }}</td>
+            <!--{% endif %}
+        {% endfor %}-->
+        <td>{{ tot_mas_pris.M }}</td><td>{{ tot_mas_pris.F }}</td>
+    </tr>
+
+    <!-- ======================== 2. MALNUTRITION MODÉRÉE PRISE EN CHARGE ======================== -->
+    <tr>
+        <td>Nombre de malnutris modéré pris en charge</td>
+        {% for g, c in mam_pris.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.M }}</td><td>{{ c.F }}</td>
+                
+            {% endif %}
+        {% endfor %}
+         <td>{{ tot_mam_pris.M }}</td><td>{{ tot_mam_pris.F }}</td>
+    </tr>
+
+    <!-- ======================== 3. MALNUTRITION SANS COMPLICATION GUÉRIS ======================== -->
+    <tr>
+        <td>Nombre de malnutris sans complication déclarés guéris</td>
+        {% for g, c in mas_gueris.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.M }}</td><td>{{ c.F }}</td>
+            {% endif %}
+        {% endfor %}
+         <td>{{ tot_mas_gueris.M }}</td><td>{{ tot_mas_gueris.F }}</td>
+    </tr>
+
+    <!-- ======================== 4. MALNUTRITION MODÉRÉE GUÉRIS ======================== -->
+    <tr>
+        <td>Nombre de malnutris modéré déclarés guéris</td>
+        {% for g, c in mam_gueris.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.M }}</td><td>{{ c.F }}</td>
+            {% endif %}
+        {% endfor %}
+        <td>{{ tot_mam_gueris.M }}</td><td>{{ tot_mam_gueris.F }}</td>
+    </tr>
+
+    <!-- ======================== 5. ABANDON ======================== -->
+    <tr>
+        <td>Abandon</td>
+        {% for g, c in abandon.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.M }}</td><td>{{ c.F }}</td>
+            {% endif %}
+        {% endfor %}
+        <td>{{ tot_abandon.M }}</td><td>{{ tot_abandon.F }}</td>
+    </tr>
+
+    <!-- ======================== 6. DÉCÈS ======================== -->
+    <tr>
+        <td>Décès</td>
+        {% for g, c in deces.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.M }}</td><td>{{ c.F }}</td>
+            {% endif %}
+        {% endfor %}
+        <td>{{ tot_deces.M }}</td><td>{{ tot_deces.F }}</td>
+    </tr>
+
+  </table>
+
+
+  <!-- ============================= LAIT EN POUDRE ============================= -->
+
+  <table class="table table-bordered text-center mt-5">
+
+      <tr class="table-secondary fw-bold">
+          <td colspan="11">DISTRIBUTION DE LAIT EN POUDRE AUX ENFANTS POUR ÉVITER LA TRANSMISSION VIH</td>
+      </tr>
+
+      <tr>
+          <td rowspan="2" class="fw-bold">Indicateurs</td>
+          <td colspan="2">0-5 mois</td>
+          <td colspan="2">6-11 mois</td>
+          <td colspan="2">12-23 mois</td>
+          <td colspan="2">24-59 mois</td>
+          <td colspan="2">Total par sexe</td>
+      </tr>
+      <tr>
+          {% for i in "12345" %}
+              <td>F</td><td>M</td>
+          {% endfor %}
+      </tr>
+
+      <!-- ===================== 1. ENFANT AYANT BÉNÉFICIÉ DE LAIT ===================== -->
+      <tr>
+          <td>Nombre d'enfant ayant bénéficié de lait</td>
+          {% for g, c in lait.items %}
+              {% if g != "TOTAL" %}
+                  <td>{{ c.F }}</td><td>{{ c.M }}</td>
+              {% endif %}
+          {% endfor %}
+          <td>{{ lait.TOTAL.F }}</td>
+          <td>{{ lait.TOTAL.M }}</td>
+      </tr>
+
+      <!-- ===================== 2. NOUVEAUX ENFANTS AYANT BÉNÉFICIÉ DE LAIT ===================== -->
+      <tr>
+          <td>Nombre de nouveau enfant ayant bénéficié de lait</td>
+          {% for g, c in lait_nouveaux.items %}
+              {% if g != "TOTAL" %}
+                  <td>{{ c.F }}</td><td>{{ c.M }}</td>
+              {% endif %}
+          {% endfor %}
+          <td>{{ lait_nouveaux.TOTAL.F }}</td>
+          <td>{{ lait_nouveaux.TOTAL.M }}</td>
+      </tr>
+
+  </table>
+
+
   {% else %}
     <p class="alert alert-info">Aucune donnée disponible pour cette période.</p>
   {% endif %}
+
 </div>
 </body>
 </html>

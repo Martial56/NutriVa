@@ -4,72 +4,163 @@
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
     background-color: darkslategray;
 }*/
-.logo { 
-    display: block;
+/* -------------------------
+   LOGO
+--------------------------*/
+.logo {
+    display: flex;
+    align-items: center;
 }
+
+.logo img {
+    height: 50px;
+    width: auto;
+    margin-left: 15px;
+}
+
+/* -------------------------
+   NAVBAR PRINCIPALE
+--------------------------*/
 nav {
-width: 100%;
-overflow:auto;
-background: white;
-flex: 1 1 40rem;
-
-}
-.button{/*Bouton connexion*/
-    background-color: #ff6a19;
-    border: none;
-    color: white;
-    padding: 15px;
-    text-align: center;
-    text-decoration: none;
-    font-family: Arial;
-    margin: 4px 2px;
-    border-radius: 2rem;
-    float:right;
-    
-}
-.profil{
-    border: none;
-    padding: 15px;
-    text-align: center;
-    text-decoration: none;
-    font-family: Arial;
-    margin: 4px 2px;
-    border-radius: 2rem;
-    float:right;
-}
-ul{
-    padding: 0;
-    margin:0 0 0 250px;
-    list-style: none;
-}
-
-li{
-    float:left;
-}
-li a{
     width: 100%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* logo à gauche / menu + boutons à droite */
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* -------------------------
+   LISTE DU MENU
+--------------------------*/
+nav ul {
+    display: flex;
+    gap: 10px;               /* espace entre les éléments */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-items: center;
+}
+
+/* ITEMS DU MENU */
+nav ul li {
+    position: relative;      /* important pour les sous-menus */
+}
+
+/* LIENS DU MENU */
+nav ul li a {
     display: block;
-    padding: 20px 15px;
+    padding: 12px 18px;
     text-decoration: none;
     font-family: Arial;
-    color:black;
-    text-align: center;
+    color: black;
+    font-size: 15px;
+    border-radius: 8px;
+    transition: 0.3s;
 }
-li a:hover{
-    background:green;
+
+/* HOVER */
+nav ul li a:hover {
+    background: #0066cc;
+    color: white;
     text-transform: uppercase;
+}
+
+/* -------------------------
+   SOUS-MENU (DROPDOWN)
+--------------------------*/
+nav ul li .dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;               /* s’affiche sous le menu */
+    left: 0;
+    background: white;
+    min-width: 180px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    z-index: 10;
+}
+
+/* Affichage du sous-menu au survol */
+nav ul li:hover .dropdown {
+    display: block;
+}
+
+/* Style des liens du sous-menu */
+nav ul li .dropdown a {
+    padding: 10px 15px;
+    display: block;
+    color: black;
+    border-radius: 0;
+}
+
+nav ul li .dropdown a:hover {
+    background: #0066cc;
     color: white;
 }
-    
-.logo img{
-    position: absolute;
-    margin-top:5px;
-    margin-left: 10px;
-    flex: 1 1 40rem;
+
+/* -------------------------
+   BOUTON CONNECTION
+--------------------------*/
+.button {
+    background-color: #0066cc;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-family: Arial;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
 }
-.option{
-    position: relative;
+
+.button:hover {
+    background-color: #e65b10;
 }
+
+/* -------------------------
+   PROFIL
+--------------------------*/
+.profil {
+    padding: 10px 20px;
+    font-family: Arial;
+    border-radius: 2rem;
+    cursor: pointer;
+}
+
+/* -------------------------
+   RESPONSIVE MOBILE
+--------------------------*/
+@media (max-width: 900px) {
+    nav {
+        flex-wrap: wrap;
+    }
+
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    nav ul li {
+        width: 100%;
+    }
+
+    nav ul li a {
+        text-align: left;
+        padding: 15px;
+        border-radius: 0;
+    }
+
+    nav ul li .dropdown {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+    }
+}
+
 
 /************ style de la pâge connexion**********************/
 .login-body {
@@ -341,6 +432,7 @@ input::placeholder {
     cursor: pointer;
     transition: transform 0.2s;
 }
+
 .icon-img:hover { transform: scale(1.1); }
 
 /* Style des cartes patient */

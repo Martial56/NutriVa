@@ -6,6 +6,7 @@ class Patient(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=300)
     date_naissance = models.DateField()
+    date_creation = models.DateField()
     sexe = models.CharField(max_length=10)
     nom_parent= models.CharField(max_length=100)
     quartier = models.CharField(max_length=100)
@@ -37,18 +38,7 @@ class Vaccination(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     date = models.DateField()
     vaccin= models.CharField(max_length=500)
-    #polio0= models.CharField(max_length=100)
-    #vpo= models.CharField(max_length=100)
-    #dtc= models.CharField(max_length=100)
-    #pcv= models.CharField(max_length=100)
-    #vpi= models.CharField(max_length=100)
-    #rota= models.CharField(max_length=100)
-    #vaa= models.CharField(max_length=100)
-    #var= models.CharField(max_length=100)
-    #vat= models.CharField(max_length=100)
-    #vam= models.CharField(max_length=100)
-    #vam= models.CharField(max_length=100)
-
+    
     def __str__(self):
         return f"Vaccination {self.vaccin} de {self.patient} le {self.date}"
     
