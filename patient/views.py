@@ -6,8 +6,11 @@ from .models import Patient, Constante, Vaccination, Rdv, Nutrition
 from datetime import datetime, date
 import calendar
 import io
+import json
+import ast
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 
 try:
@@ -22,6 +25,7 @@ except:
 
 
 #la vue pour la page d'accueil
+@login_required
 def index(request):
     return render(request, 'patient/index.html')
 
@@ -45,7 +49,30 @@ def rdv(request):
 #la vue pour la page de saisie des vaccinations
 def vaccination(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
-    return render(request, 'patient/vaccination.html', {"patient": patient})
+
+    vaccins_faits_raw = Vaccination.objects.filter(patient=patient).values_list('vaccin', flat=True)
+
+    vaccins_faits = []
+
+    for entry in vaccins_faits_raw:
+        try:
+            # Cas où entry est une liste sous forme de chaîne : "['vpo1','hpv']"
+            parsed = ast.literal_eval(entry)
+            if isinstance(parsed, list):
+                vaccins_faits.extend(parsed)
+            else:
+                vaccins_faits.append(parsed)
+        except Exception:
+            # Cas où entry = "vpo1" simple
+            vaccins_faits.append(entry)
+
+    #print("VACCINS FINAUX =", vaccins_faits)
+
+    return render(request, 'patient/vaccination.html', {
+        "patient": patient,
+        "age_mois": patient.age,
+        "vaccins_faits_json": json.dumps(vaccins_faits),
+    })
 
 # la vue pour la page nutrition
 def nutrition(request, patient_id):
@@ -105,17 +132,6 @@ def enregistrement_patient(request):
         patient.save()
         return redirect('liste_patients')  # Rediriger vers la liste des patients après l'enregistrement
     return render(request, 'patient/creer_patient.html')
-
-#Générer le code unique pour le patient dans le formulaire de constante
-def code_unique(request):
-    # Récupère le nombre actuel de patients
-    count = Patient.objects.count() + 1
-
-    # Génère le code unique du type NUT0001
-    code = "NUT" + str(count).zfill(4)
-
-    # Envoie ce code vers le template
-    return render(request, 'patient/nutrition.html', {'code': code})
 
 #Bouton enregistrer de la page saisie des constantes
 def enregistrement_constante(request, patient_id):
@@ -899,3 +915,31 @@ def _report_to_pdf(request, context):
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="rapport_{context["date_debut"]}_{context["date_fin"]}.pdf"'
     return response
+
+def historique_patient(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    # Calcul âge lisible (années + mois)
+    today = date.today()
+    years = today.year - patient.date_naissance.year
+    months = today.month - patient.date_naissance.month
+    if months < 0:
+        years -= 1
+        months += 12
+    age_affichage = f"{years} ans {months} mois"
+
+    constantes = Constante.objects.filter(patient=patient).order_by("-date")
+    vaccinations = Vaccination.objects.filter(patient=patient).order_by("-date")
+    nutritions = Nutrition.objects.filter(patient=patient).order_by("-date_visite")
+    rdvs = Rdv.objects.filter(patient=patient).order_by("-date_enregistrement")
+
+    context = {
+        "patient": patient,
+        "age_affichage": age_affichage,
+        "constantes": constantes,
+        "vaccinations": vaccinations,
+        "nutritions": nutritions,
+        "rdvs": rdvs,
+    }
+
+    return render(request, "patient/historique.html", context)

@@ -5,18 +5,27 @@
     background-color: darkslategray;
 }*/
 /* -------------------------
-   LOGO
+   PAGE D'ACCUEIL - LOGO
 --------------------------*/
-.logo {
-    display: flex;
-    align-items: center;
+/* LOGO RESPONSIVE */
+.logo img {
+    height: 50px; /* hauteur fixe harmonieuse */
+    width: auto;  /* largeur automatique pour garder les proportions */
 }
 
-.logo img {
-    height: 50px;
-    width: auto;
-    margin-left: 15px;
+/* Sur petits écrans : réduire le logo */
+@media (max-width: 768px) {
+    .logo img {
+        height: 40px;
+    }
 }
+
+@media (max-width: 480px) {
+    .logo img {
+        height: 35px;
+    }
+}
+
 
 /* -------------------------
    NAVBAR PRINCIPALE
@@ -104,7 +113,7 @@ nav ul li .dropdown a:hover {
 /* -------------------------
    BOUTON CONNECTION
 --------------------------*/
-.button {
+.btn_connexion {
     background-color: #0066cc;
     border: none;
     color: white;
@@ -116,7 +125,7 @@ nav ul li .dropdown a:hover {
     transition: 0.3s;
 }
 
-.button:hover {
+.btn_connexion:hover {
     background-color: #e65b10;
 }
 
@@ -161,8 +170,9 @@ nav ul li .dropdown a:hover {
     }
 }
 
-
+/***************************************************************************************/
 /************ style de la pâge connexion**********************/
+/***************************************************************************************/
 .login-body {
     /* Fond violet similaire à l'image 
     background-color: #6a3e9c; */
@@ -259,9 +269,9 @@ input::placeholder {
     font-weight: bold;
     display: block; /* Mettre le lien sur une nouvelle ligne, si désiré */
 }
-
+/***************************************************************************************/
 /**************** style de la page constante*******************/
-
+/***************************************************************************************/
 .constante_body {
     font-family: Arial, sans-serif;
     background-color: white; /* Fond gris clair */
@@ -381,26 +391,15 @@ input::placeholder {
 }
 
 .btn-vaccin, .btn-nutrition{
-    background-color: #5cb85c; /* Vert */
+    background-color: #0066cc; /* bleu */
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border: none;
+    padding: 10px 20px;
 }
-
-/* Style pour le bouton grisé/désactivé (comme demandé) */
-/* Fichier style_constantes.css */
-
-/* Style pour tous les boutons désactivés/grisés */
-.btn.disabled {
-    background-color: #aaa !important; /* Gris */
-    color: #666 !important;
-    cursor: not-allowed !important;
-    box-shadow: none !important;
-}
-
-/* S'assurer que le bouton vaccin est vert par défaut */
-.btn-vaccin, .btn-nutrition {
-    background-color: #5cb85c; 
-    color: white;
+.btn-vaccin:hover, .btn-nutrition:hover {
+    background-color: #e65b10; /* orange */
 }
 /* Note d'information */
 .note-info {
@@ -410,8 +409,9 @@ input::placeholder {
     font-size: 0.9em;
     line-height: 1.5;
 }
-
+/***************************************************************************************/
 /******* style de la page liste patient **********************/
+/***************************************************************************************/
 .header-bar-liste{
     background-color: #3f7ac5;
     color: white;
@@ -459,8 +459,9 @@ input::placeholder {
     padding: 10px 20px;
     border-radius: 10px;
 }
-
+/***************************************************************************************/
 /************* style de la page vaccination*******************/
+/***************************************************************************************/
 
 .vaccin-body {
     font-family: Arial, sans-serif;
@@ -507,10 +508,26 @@ input::placeholder {
 
 .btn-annuler {
     background-color: #f0803a; /* Orange */
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .btn-enregistrer {
     background-color: #5cb85c; /* Vert */
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* --- 2. Informations du patient --- */
@@ -632,17 +649,13 @@ input::placeholder {
   display: flex;
   align-items: center;
   gap: 6px;
-  /*border: 1px solid #ddd;
-  border-radius: 4px;*/
   padding: 6px 10px;
-  /*background-color: #fff;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
-  flex: 0 1 auto; /* largeur auto, mais s'adapte */
   white-space: nowrap; /* empêche les labels de sauter à la ligne */
 }
+/***************************************************************************************/
+/*********************** style de la page nutrition ******************/
+/***************************************************************************************/
 
-/*********************** style de la pade nutrition ******************/
-/* ---------- STRUCTURE GÉNÉRALE ---------- */
 body.nutrition-body {
   font-family: "Segoe UI", Arial, sans-serif;
   background-color: #f8f9fa;
@@ -677,6 +690,11 @@ body.nutrition-body {
 
 .btn-save {
   background-color: #4CAF50;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: bold;
 }
 
 .btn:hover {
@@ -794,16 +812,9 @@ body.nutrition-body {
   font-size: 15px;
   box-sizing: border-box;
 }
-
+/***************************************************************************************/
 /************ style de la page rendez-vous *******************/
-
-/* Styles généraux 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }*/
+/***************************************************************************************/
 
 .container {
     /*max-width: 1000px;*/
@@ -813,14 +824,6 @@ body.nutrition-body {
 }
 
 /* En-tête bleu */
-.header {
-    background-color: #004d99; /* Bleu foncé */
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
 
 .header h1 {
     margin: 0;
@@ -913,8 +916,9 @@ body.nutrition-body {
 }
 
 /* Styles des boutons */
-.button {
+.btn_filtrer {
     border: none;
+    background-color: #0066cc;
     color: white;
     padding: 6px 8px; /* Réduit le padding pour s'adapter à la petite largeur */
     text-align: center;
@@ -928,18 +932,32 @@ body.nutrition-body {
     /* Suppression du margin horizontal pour gagner de la place */
     margin: 4px 0; 
 }
+.btn_filtrer:hover {
+    background-color:#e65b10;
+}
 
 .vaccin-button {
     background-color: #4CAF50; /* Vert */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 10px;
+    margin-left: 10px;
+    color: white;
+    padding: 5px;
 }
 
 .nutrition-button {
     background-color: #ff8c00; /* Orange */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 10px;
+    margin-left: 10px;
+    color: white;
+    padding: 5px;
 }
-
+/***************************************************************************************/
 /************* style de la page enregistrement patient *******************/
+/***************************************************************************************/
 .container-enregistrement{
     margin: 20px auto;
 }

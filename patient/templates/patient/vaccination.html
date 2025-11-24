@@ -13,8 +13,8 @@
     <div class="header-bar-vaccin">
         <h1>Vaccination</h1>
         <div class="header-buttons">
-            <button class="btn btn-annuler">Annuler</button>
-            <button class="btn btn-enregistrer" type="submit" form="formVaccin">Enregistrer</button>
+            <button class="btn-annuler" type="reset" form="formVaccin">Annuler</button>
+            <button class="btn-enregistrer" type="submit" form="formVaccin">Enregistrer</button>
         </div>
     </div>
 
@@ -33,62 +33,62 @@
           <div class="vaccination-grid">
             <div class="vaccin-column">
               <div class="column-header">À la naissance</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_0" value="Dtc_HepB_Hib_0"><label for="v_dtch_0">DTC-HepB-Hib 1</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_bcg" value="BCG"><label for="v_bcg">BCG</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo0" value="VPO0"><label for="v_vpo0">VPO 0</label></div>    
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_0" value="dtc_hepb_hib_0" data-required-age="0"><label for="v_dtch_0">DTC-HepB-Hib 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_bcg" value="bcg" data-required-age="0"><label for="v_bcg">BCG</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo0" value="vpo0" data-required-age="0"><label for="v_vpo0">VPO 0</label></div>    
             </div>
 
             <div class="vaccin-column">
               <div class="column-header">À 6 semaine</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_1" value="Dtc_HepB_Hib_1"><label for="v_dtch_1">DTC-HepB-Hib 1</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_pcv1" value="PCV1"><label for="v_pcv1">PCV1-1</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo1" value="VPO1"><label for="v_vpo1">VPO 1</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rota1" value="ROTA1"><label for="v_rota1">ROTA 1</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpi1" value="VPI1"><label for="v_vpi1">VPI 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_1" value="dtc_hepb_hib_1" data-required-age="1.5"><label for="v_dtch_1">DTC-HepB-Hib 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_pcv1" value="pcv1" data-required-age="1.5"><label for="v_pcv1">PCV1-1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo1" value="vpo1" data-required-age="1.5"><label for="v_vpo1">VPO 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rota1" value="rota1" data-required-age="1.5"><label for="v_rota1">ROTA 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpi1" value="vpi1" data-required-age="1.5"><label for="v_vpi1">VPI 1</label></div>
             </div>
 
             <div class="vaccin-column">
               <div class="column-header">À 10 semaine</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_2" value="Dtc_HepB_Hib_2"><label for="v_dtch_2">DTC-HepB-Hib 2</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_pcv2" value="PCV2"><label for="v_pcv2">PCV13-2</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo2" value="VPO2"><label for="v_vpo2">VPO 2</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rota2" value="ROTA2"><label for="v_rota2">ROTA 2</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_2" value="dtc_hepb_hib_2" data-required-age="2.5"><label for="v_dtch_2">DTC-HepB-Hib 2</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_pcv2" value="pcv2" data-required-age="2.5"><label for="v_pcv2">PCV13-2</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo2" value="vpo2" data-required-age="2.5"><label for="v_vpo2">VPO 2</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rota2" value="rota2" data-required-age="2.5"><label for="v_rota2">ROTA 2</label></div>
             </div>
 
             <div class="vaccin-column">
               <div class="column-header">À 14 semaine</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_3" value="Dtc_HepB_Hib_3"><label for="v_dtch_3">DTC-HepB-Hib 3</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_pcv3" value="PCV3"><label for="v_pcv3">PCV13-3</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo3" value="VPO3"><label for="v_vpo3">VPO 3</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpi2" value="VPI2"><label for="v_vpi2">VPI 2</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_3" value="dtc_hepb_hib_3" data-required-age="3.5"><label for="v_dtch_3">DTC-HepB-Hib 3</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_pcv3" value="pcv3" data-required-age="3.5"><label for="v_pcv3">PCV13-3</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo3" value="vpo3" data-required-age="3.5"><label for="v_vpo3">VPO 3</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpi2" value="vpi2" data-required-age="3.5"><label for="v_vpi2">VPI 2</label></div>
             </div>
           
             <div class="vaccin-column complex-column">
               <div class="column-header">À 24 semaine</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap1" value="VAP1"><label for="v_vap1">VAP 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap1" value="vap1" data-required-age="6"><label for="v_vap1">VAP 1</label></div>
 
               <div class="vaccin-sub-box">
                 <div class="sub-header">À 32 semaine</div>
-                <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap2" value="VAP2"><label for="v_vap2">VAP 2</label></div>
+                <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap2" value="vap2" data-required-age="8"><label for="v_vap2">VAP 2</label></div>
               </div>
             </div>
 
             <div class="vaccin-column">
               <div class="column-header">À 9 mois</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rr1" value="RR1"><label for="v_rr1">RR 1</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vaa" value="VAA"><label for="v_vaa">VAA</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_mena" value="MenA"><label for="v_mena">Men A</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap3" value="VAP3"><label for="v_vap3">VAP 3</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rr1" value="rr1" data-required-age="9"><label for="v_rr1">RR 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vaa" value="vaa" data-required-age="9"><label for="v_vaa">VAA</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_mena" value="mena" data-required-age="9"><label for="v_mena">Men A</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap3" value="vap3" data-required-age="9"><label for="v_vap3">VAP 3</label></div>
             </div>
 
             <div class="vaccin-column complex-column">
               <div class="column-header">À 15 mois</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rr2" value="RR2"><label for="v_rr2">RR 2</label></div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap4" value="VAP4"><label for="v_vap4">VAP 4</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_rr2" value="rr2" data-required-age="15"><label for="v_rr2">RR 2</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vap4" value="vap4" data-required-age="15"><label for="v_vap4">VAP 4</label></div>
               
               <div class="vaccin-sub-box">
                 <div class="sub-header">À 9ans Fille</div>
-                <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_hpv" value="HPV"><label for="v_hpv">HPV</label></div>
+                <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_hpv" value="hpv" data-required-age="108"><label for="v_hpv">HPV</label></div>
               </div>
             </div>
             </div> 
@@ -110,5 +110,85 @@
             </div>
           </div> 
         </form>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+
+          // Récupération de l'âge réel en mois (numérique)
+          const agePatient = Number("{{patient.age }}");  
+          console.log("Âge patient (mois) =", agePatient);
+
+          // Id → âge minimum requis
+          const ageRequired = {
+              "v_dtch_0": 0,
+              "v_bcg": 0,
+              "v_vpo0": 0,
+
+              "v_dtch_1": 6,
+              "v_pcv1": 6,
+              "v_vpo1": 6,
+              "v_rota1": 6,
+              "v_vpi1": 6,
+
+              "v_dtch_2": 10,
+              "v_pcv2": 10,
+              "v_vpo2": 10,
+              "v_rota2": 10,
+
+              "v_dtch_3": 14,
+              "v_pcv3": 14,
+              "v_vpo3": 14,
+              "v_vpi2": 14,
+
+              "v_vap1": 24,
+              "v_vap2": 32,
+
+              "v_rr1": 9,
+              "v_vaa": 9,
+              "v_mena": 9,
+              "v_vap3": 9,
+
+              "v_rr2": 15,
+              "v_vap4": 15,
+
+              "v_hpv": 108
+          };
+
+          // Liste des vaccins déjà faits
+          const vaccinsDejaFaits = JSON.parse('{{ vaccins_faits_json|safe }}');
+
+          console.log("Vaccins déjà faits =", vaccinsDejaFaits);
+
+          // Parcourir toutes les cases
+          Object.keys(ageRequired).forEach(id => {
+
+              const checkbox = document.getElementById(id);
+              if (!checkbox) return;
+
+              const vaccinValue = checkbox.value;
+
+              // 1️⃣ Blocage si vaccin déjà fait
+              if (vaccinsDejaFaits.includes(vaccinValue)) {
+                  checkbox.disabled = true;
+                  checkbox.checked = true;
+                  return;
+              }
+
+              // 2️⃣ Blocage si âge insuffisant
+              const ageMin = ageRequired[id];
+
+              if (agePatient < ageMin) {
+                  checkbox.disabled = true;
+                  checkbox.checked = false; // sécurité
+              }
+
+          });
+
+      });
+      </script>
+
+
+
     </body>
 </html>

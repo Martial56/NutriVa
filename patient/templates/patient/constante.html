@@ -33,27 +33,27 @@
                     <label for="date">Date</label>
                     <input type="date" id="date" name="date" value="{{ today|date:'Y-m-d' }}">
 
-                    <label for="taille">Taille</label>
-                    <input type="text" id="taille" name="taille" inputmode="numeric" maxlength="3" pattern="[0-9]*">
+                    <label for="taille">Taille (cm)</label>
+                    <input type="text" id="taille" name="taille" inputmode="numeric" maxlength="4" pattern="[0-9]*">
 
-                    <label for="poids">Poids</label>
+                    <label for="poids">Poids (kg)</label>
                     <input type="text" id="poids" name="poids" inputmode="numeric" maxlength="3" pattern="[0-9]*">
 
                     <label for="pb">P. B.</label>
                     <input type="text" id="pb" name="pb" inputmode="numeric" maxlength="3" pattern="[0-9]*">
 
                     <label for="imc">IMC</label>
-                    <input type="text" id="imc" name="imc" inputmode="numeric" maxlength="3" pattern="[0-9]*">
+                    <input type="text" id="imc" name="imc" inputmode="numeric" maxlength="3" pattern="[0-9\-\.]*" readonly>
 
                     <label for="zscore">Z-score</label>
-                    <input type="text" id="zscore" name="zscore" inputmode="numeric" maxlength="3" pattern="[0-9]*">
+                    <input type="text" id="zscore" name="zscore" inputmode="numeric" maxlength="3" pattern="[0-9\-\.]*">
 
                     <label for="indicec">Indice C</label>
                     <input type="text" id="indicec" name="indicec">
                 </div>
 
                 <div class="button-group">
-                    <a href="{% url 'rdv'%}"><button type="submit" class="btn btn-vaccin" id="btnVaccin">Enregistrer</button></a>
+                    <a href="{% url 'rdv'%}"><button type="submit" class="btn-vaccin" id="btnVaccin">Enregistrer</button></a>
                     <!--<button type="submit" class="btn btn-nutrition" id="btnNutrition">Nutrition</button>-->
                 </div>
             </form>
@@ -68,67 +68,102 @@
 
 <!-- gestion des bouton par javascript-->
 <script> 
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1. Récupération des éléments du DOM
+document.addEventListener('DOMContentLoaded', () => {
+
+    // -----------------------------
+    // 1. RÉCUPÉRATION DES ÉLÉMENTS
+    // -----------------------------
+    const poidsField = document.getElementById('poids');
+    const tailleField = document.getElementById('taille');
     const imcField = document.getElementById('imc');
-    const zscoreField = document.getElementById('zscore'); // Ajout du Z-score pour une vérification plus complète
+    const zscoreField = document.getElementById('zscore');
 
     const btnVaccin = document.getElementById('btnVaccin');
     const btnNutrition = document.getElementById('btnNutrition');
-    const indicec= document.getElementById('indicec');
-    indicec.value="";
+    const indicec = document.getElementById('indicec');
 
-    // 2. Fonction de vérification de l'état du patient
+    indicec.value = "";
+
+    // -----------------------------------------
+    // 2. CALCUL AUTOMATIQUE IMC
+    // -----------------------------------------
+    function calculerIMC() {
+        const poidsValue = parseFloat(poidsField.value);
+        const tailleValue = parseFloat(tailleField.value);
+
+        if (!poidsValue || !tailleValue || tailleValue === 0) {
+            imcField.value = "";
+            return;
+        }
+
+        const imc = poidsValue / ((tailleValue / 100) ** 2);
+        imcField.value = imc.toFixed(2);
+    }
+
+    // -----------------------------------------
+    // 3. LOGIQUE Z-SCORE + ÉTAT NUTRITIONNEL
+    // -----------------------------------------
     function checkPatientStatusAndToggleButtons() {
         const imcValue = parseFloat(imcField.value);
         const zscoreValue = parseFloat(zscoreField.value);
-        // **********************************************
-        // LOGIQUE DES BOTOUNS
-        // **********************************************
 
-        // ******************* definir état nutritionnel par zscore***************************
+        // -----------------------------
+        // LOGIQUE ÉTAT NUTRITIONNEL
+        // -----------------------------
         switch (true) {
             case (zscoreValue < -3):
-                indicec.value = "MAS";
+                indicec.value = "MAS";  // Malnutrition Aiguë Sévère
                 btnNutrition.classList.remove('disabled');
                 break;
+
             case (zscoreValue >= -3 && zscoreValue < -2):
-                indicec.value = "MAM";
+                indicec.value = "MAM";  // Malnutrition Aiguë Modérée
                 btnNutrition.classList.remove('disabled');
                 break;
+
             case (zscoreValue >= -2 && zscoreValue <= 1):
                 indicec.value = "Normal";
                 btnNutrition.classList.add('disabled');
                 break;
+
             case (zscoreValue > 1 && zscoreValue <= 2):
                 indicec.value = "Surpoids";
                 btnNutrition.classList.remove('disabled');
                 break;
+
             case (zscoreValue > 2):
-                indicec.value = "Obesite";
+                indicec.value = "Obésité";
                 btnNutrition.classList.remove('disabled');
                 break;
+
             default:
                 indicec.value = "";
         }
-        
-        
-        // Si les champs sont vides, on grise le bouton nutrition
-        //if (isNaN(zscoreValue) || zscoreField.value.trim() === "") {
-        //     btnVaccin.classList.add('disabled');
-        //     btnNutrition.classList.add('disabled');
-             
-        //}
     }
 
-    // 3. Ajout des écouteurs d'événements
-    // Le script s'exécute à chaque fois qu'une valeur change dans les champs importants
-    imcField.addEventListener('input', checkPatientStatusAndToggleButtons);
+    // -----------------------------------------
+    // 4. ÉVÉNEMENTS POUR IMC + ZSCORE
+    // -----------------------------------------
+    poidsField.addEventListener('input', () => {
+        calculerIMC();
+        checkPatientStatusAndToggleButtons();
+    });
+
+    tailleField.addEventListener('input', () => {
+        calculerIMC();
+        checkPatientStatusAndToggleButtons();
+    });
+
     zscoreField.addEventListener('input', checkPatientStatusAndToggleButtons);
 
-    // 4. Appel initial de la fonction au chargement de la page
+    // -----------------------------------------
+    // 5. EXÉCUTER AU CHARGEMENT
+    // -----------------------------------------
+    calculerIMC();
     checkPatientStatusAndToggleButtons();
+
 });
 </script>
+
 </body>
 </html>

@@ -10,7 +10,7 @@
 <body>
 {% include 'patient/header.html' %}
     <div class="container">
-        <div class="header">
+        <div class="header-bar-vaccin">
             <h1>Rendez-vous</h1>
         </div>
 
@@ -21,7 +21,7 @@
                 <input type="date" name="datedebut" id="datedebut" value="{{ date_debut|default:today|date:'Y-m-d' }}">
                 <label for="datefin">Date de fin</label>
                 <input type="date" name="datefin" id="datefin" value="{{ date_fin|default:today|date:'Y-m-d' }}">
-                <button type="submit" class="button">Filtrer</button>
+                <button type="submit" class="btn_filtrer">Filtrer</button>
             </div>
         </form>
 
@@ -49,8 +49,8 @@
                     <td>{{ d.rdv.produits_list }}</td>
                     <td>{{ d.vaccination.vaccin|default:"-" }}</td>
                     <td>
-                        <a href="{% url 'vaccination' d.patient.id %}"><button class="button vaccin-button">Vaccin</button></a>
-                        <a href="{% url 'nutrition' d.patient.id %}"><button class="button nutrition-button">Nutrition</button></a>
+                        <a href="{% url 'vaccination' d.patient.id %}"><button class="vaccin-button">Vaccin</button></a>
+                        <a href="{% url 'nutrition' d.patient.id %}"><button class="nutrition-button">Nutrition</button></a>
                     </td>
                 </tr>
                 
@@ -60,6 +60,14 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!window.location.search) {
+                document.querySelector("form").submit();
+            }
+        });
+    </script>
 
 </body>
 </html>

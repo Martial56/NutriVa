@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique du Patient</title>
+
+    <!-- Ton CSS -->
+    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    {% include 'patient/header.html' %}
+
+    <div class="header-bar-vaccin">
+        <h1>Historique du Patient</h1>
+    </div>
+
+    <div class="card m-3 p-3">
+        <h4>Informations générales du Patient</h4>
+        <p><strong>Nom :</strong> {{ patient.nom }}</p>
+        <p><strong>Prénom :</strong> {{ patient.prenom }}</p>
+        <p><strong>Âge :</strong> {{ age_affichage }}</p>
+        <p><strong>Sexe :</strong> {{ patient.sexe }}</p>
+        <p><strong>Nom du parent :</strong> {{ patient.nom_parent }}</p>
+        <p><strong>Quartier :</strong> {{ patient.quartier }}</p>
+        <p><strong>Téléphone :</strong> {{ patient.telephone }}</p>
+        <p><strong>Date d’enregistrement :</strong> {{ patient.date_creation }}</p>
+    </div>
+
+    <!-- Navigation onglets -->
+    <ul class="nav nav-tabs" id="patientTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="vaccination-tab" data-bs-toggle="tab" data-bs-target="#vaccination" type="button" role="tab">
+                Vaccination
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link" id="nutrition-tab" data-bs-toggle="tab" data-bs-target="#nutrition" type="button" role="tab">
+                Nutrition
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link" id="constante-tab" data-bs-toggle="tab" data-bs-target="#constante" type="button" role="tab">
+                Constante
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link" id="apport_nutrition-tab" data-bs-toggle="tab" data-bs-target="#apport_nutrition" type="button" role="tab">
+                Apport Nutritionnel
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenu des onglets -->
+    <div class="tab-content mt-3" id="patientTabsContent">
+
+        <!-- Vaccination -->
+        <div class="tab-pane fade show active" id="vaccination" role="tabpanel">
+            <h3> Vaccinations</h3>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Vaccin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vaccinations %}
+                    <tr>
+                        <td>{{ v.date }}</td>
+                        <td>{{ v.vaccin }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="2">Aucune vaccination.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Constantes -->
+        <div class="tab-pane fade" id="constante" role="tabpanel">
+            <h3> Constantes</h3>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Poids</th>
+                        <th>Taille</th>
+                        <th>PB</th>
+                        <th>IMC</th>
+                        <th>Z-Score</th>
+                        <th>Indice corporel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in constantes %}
+                    <tr>
+                        <td>{{ c.date }}</td>
+                        <td>{{ c.poids }}</td>
+                        <td>{{ c.taille }}</td>
+                        <td>{{ c.perimetre_brachial }}</td>
+                        <td>{{ c.imc }}</td>
+                        <td>{{ c.zscore }}</td>
+                        <td>{{ c.indicecorporel }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7">Aucune constante.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Nutrition -->
+        <div class="tab-pane fade" id="nutrition" role="tabpanel">
+            <h3> Suivi Nutrition</h3>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Date visite</th>
+                        <th>Admission</th>
+                        <th>Sortie</th>
+                        <th>État</th>
+                        <th>Motif</th>
+                        <th>Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for n in nutritions %}
+                    <tr>
+                        <td>{{ n.date_visite }}</td>
+                        <td>{{ n.date_admission }}</td>
+                        <td>{{ n.date_sortie|default:"-" }}</td>
+                        <td>{{ n.etat_nutrition }}</td>
+                        <td>{{ n.motif_sortie|default:"-" }}</td>
+                        <td>{{ n.code_nutrition }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6">Aucun suivi nutritionnel.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Apport nutritionnel -->
+        <div class="tab-pane fade" id="apport_nutrition" role="tabpanel">
+            <h3> Dépistage & Apports Nutritionnels</h3>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Dépisté</th>
+                        <th>Code</th>
+                        <th>Résultat</th>
+                        <th>Produits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rdvs %}
+                    <tr>
+                        <td>{{ r.date_enregistrement }}</td>
+                        <td>{{ r.depiste }}</td>
+                        <td>{{ r.code_depistage }}</td>
+                        <td>{{ r.resultat }}</td>
+                        <td>{{ r.produits_list }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">Aucun apport nutritionnel.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS (obligatoire pour les tabs) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

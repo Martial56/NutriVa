@@ -13,8 +13,8 @@
   <div class="header-bar-vaccin">
         <h1>Rendez-vous nutritionnel</h1>
         <div class="header-buttons">
-            <button class="btn btn-annuler">Annuler</button>
-            <button class="btn btn-enregistrer" form="formapport_nutrition" type="submit">Enregistrer</button>
+            <button class="btn-annuler" type="reset" form="formapport_nutrition">Annuler</button>
+            <button class="btn-enregistrer" form="formapport_nutrition" type="submit">Enregistrer</button>
         </div>
     </div>
 
@@ -66,7 +66,7 @@
           </select>
         </div>
         <div class="form-group btn-right">
-          <button class="btn btn-save" type="submit">Enregistrer</button>
+          <button class="btn-save" type="submit">Enregistrer</button>
         </div>
       </div>
     </form>
@@ -83,7 +83,7 @@
 
           <div class="form-group">
             <label for="code_depistage">Code de dépistage</label>
-            <input type="text" id="code_depistage" name="code_depistage" placeholder="ex: 09817/01/01/25/00001">
+            <input type="text" id="code_depistage" name="code_depistage" placeholder="ex: 09817/01/01/25/00001" maxlength="22" pattern="\d{5}/\d{2}/\d{2}/\d{2}/\d{5}" title="Format attendu : 09817/01/01/25/00001">
           </div>
 
           <p><strong>Résultat de dépistage</strong></p>
@@ -103,5 +103,21 @@
       </div>
     </form>
   </main>
+  <script>
+    document.getElementById('code_depistage').addEventListener('input', function(e) {
+        // Supprimer tout sauf les chiffres
+        let v = e.target.value.replace(/\D/g, "");
+
+        let formatted = "";
+
+        if (v.length > 0)  formatted += v.substring(0, 5);
+        if (v.length > 5)  formatted += "/" + v.substring(5, 7);
+        if (v.length > 7)  formatted += "/" + v.substring(7, 9);
+        if (v.length > 9)  formatted += "/" + v.substring(9, 11);
+        if (v.length > 11) formatted += "/" + v.substring(11, 16);
+
+        e.target.value = formatted;
+    });
+</script>
 </body>
 </html>
