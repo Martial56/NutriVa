@@ -9,8 +9,8 @@
 --------------------------*/
 /* LOGO RESPONSIVE */
 .logo img {
-    height: 50px; /* hauteur fixe harmonieuse */
-    width: auto;  /* largeur automatique pour garder les proportions */
+    height: 60px; /* hauteur fixe harmonieuse */
+    width: 150px;  /* largeur automatique pour garder les proportions */
 }
 
 /* Sur petits écrans : réduire le logo */
@@ -38,7 +38,7 @@ nav {
     justify-content: space-between; /* logo à gauche / menu + boutons à droite */
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 /* -------------------------
@@ -177,7 +177,7 @@ nav ul li .dropdown a:hover {
     /* Fond violet similaire à l'image 
     background-color: #6a3e9c; */
     
-    background-image: url('../images/image_seringue.png'); 
+    background-image: url("../images/accueil_image1.png"); /* Image de fond */ 
     background-size: cover;
     background-position: center; 
     

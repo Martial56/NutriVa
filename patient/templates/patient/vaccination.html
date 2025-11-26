@@ -33,7 +33,7 @@
           <div class="vaccination-grid">
             <div class="vaccin-column">
               <div class="column-header">À la naissance</div>
-              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_0" value="dtc_hepb_hib_0" data-required-age="0"><label for="v_dtch_0">DTC-HepB-Hib 1</label></div>
+              <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_dtch_0" value="dtc_hepb_hib_0" data-required-age="0"><label for="v_dtch_0">DTC-HepB-Hib 0</label></div>
               <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_bcg" value="bcg" data-required-age="0"><label for="v_bcg">BCG</label></div>
               <div class="vaccin-item"><input type="checkbox" name="vaccins" id="v_vpo0" value="vpo0" data-required-age="0"><label for="v_vpo0">VPO 0</label></div>    
             </div>
@@ -95,12 +95,12 @@
             <div class="autre-vaccin-column">
               <div class="column-header">Autres vaccin</div>
               <div class="vaccin-items-container">
-                <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_vam" value="vam"><label for="v_vam">Vaccin anti-meningocique</label></div>
-                <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_ecv" value="ecv"><label for="v_ecv">Enfant complèmentent vacciné</label></div>
+                <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_vam" value="vam" data-required-age="9"><label for="v_vam">Vaccin anti-meningocique</label></div>
+                <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_ecv" value="ecv" data-required-age="15"><label for="v_ecv">Enfant complèmentent vacciné</label></div>
                 <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_epn" value="epn"><label for="v_epn">Enfant protégé à la naissance</label></div>
                 <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_eabmilda" value="eabmilda"><label for="v_eabmilda">Enfant ayant bénéficié de MILDA</label></div>
-                <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_ahb" value="ahb"><label for="v_ahb">Vaccin anti-hépatite B</label></div>
-                <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_vaxigrip" value="vaxigrip"><label for="v_vaxigrip">Vaxigrip</label></div>
+                <!--<div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_ahb" value="ahb"><label for="v_ahb">Vaccin anti-hépatite B</label></div>-->
+                <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_vaxigrip" value="vaxigrip" data-required-age="6"><label for="v_vaxigrip">Vaxigrip</label></div>
                 <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_vat1" value="vat1"><label for="v_vat1">VAT 1</label></div>
                 <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_vat2" value="vat2"><label for="v_vat2">VAT 2</label></div>
                 <div class="vaccin-item-autre"><input type="checkbox" name="vaccins" id="v_vatrap1" value="vatrap1"><label for="v_vatrap1">VAT 1er rappel</label></div>
@@ -130,6 +130,8 @@
               "v_vpo1": 6,
               "v_rota1": 6,
               "v_vpi1": 6,
+              "v_vaxigrip": 6,
+              
 
               "v_dtch_2": 10,
               "v_pcv2": 10,
@@ -148,9 +150,11 @@
               "v_vaa": 9,
               "v_mena": 9,
               "v_vap3": 9,
+              "v_vam" : 9,
 
               "v_rr2": 15,
               "v_vap4": 15,
+              "v_ecv": 15,
 
               "v_hpv": 108
           };

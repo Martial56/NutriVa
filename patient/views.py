@@ -789,6 +789,52 @@ def rapports(request):
                 lait_nouveaux["TOTAL"][sexe] += 1
                 lait_nouveaux["TOTAL"]["TOTAL"] += 1
                 break
+            
+    # --- 🟩 Enfants ayant reçu de la vitamine A et déparasitant ---
+    age_groups = {
+        "6-11": (6, 11),
+        "12-59": (12, 59),
+        "60+": (60, 200),
+    }
+
+    def empty():
+        return {"F": 0, "M": 0, "TOTAL": 0}
+
+    # Conteneurs
+    vitA100 = {g: empty() for g in age_groups}; vitA100["TOTAL"] = empty()
+    vitA200 = {g: empty() for g in age_groups}; vitA200["TOTAL"] = empty()
+    deparasitant = {g: empty() for g in age_groups}; deparasitant["TOTAL"] = empty()
+
+    # RDV filtrés par date
+    rdvs = Rdv.objects.filter(
+        date_enregistrement__range=(start_date, end_date)
+    ).select_related("patient")
+
+    # Fonction de comptage générique
+    def count_product(rdv_list, container):
+        for r in rdv_list:
+            p = r.patient
+            age = p.age
+            sexe = p.sexe.upper()[0] if p.sexe else "M"
+
+            for grp, (low, high) in age_groups.items():
+                if low <= age <= high:
+                    container[grp][sexe] += 1
+                    container[grp]["TOTAL"] += 1
+
+                    container["TOTAL"][sexe] += 1
+                    container["TOTAL"]["TOTAL"] += 1
+                    break
+
+    # Produits
+    rdv_vitA100 = [r for r in rdvs if "vitA100" in r.produits]
+    rdv_vitA200 = [r for r in rdvs if "vitA200" in r.produits]
+    rdv_deparasitant = [r for r in rdvs if "deparasitant" in r.produits]
+
+    # Comptages
+    count_product(rdv_vitA100, vitA100)
+    count_product(rdv_vitA200, vitA200)
+    count_product(rdv_deparasitant, deparasitant)
 
     context = {
         #============ rapport: tableau : Evaluation nutritionnelle ===============
@@ -839,6 +885,10 @@ def rapports(request):
         ############ rapport: tableau : Enfants ayant reçu du lait ############
         "lait": lait,
         "lait_nouveaux": lait_nouveaux,
+        ############ rapport: tableau : Enfants ayant reçu du Vitamine A et déparasitant ############
+        "vitA100": vitA100,
+        "vitA200": vitA200,
+        "deparasitant": deparasitant,
         
     }
 

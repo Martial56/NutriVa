@@ -321,6 +321,60 @@
     </tr>
 
   </table>
+<!-- ============================= DISTRIBUTION DE VITAMINE A ET depar ============================= -->
+<table class="table table-bordered text-center">
+    <tr class="table-secondary fw-bold">
+        <td>Indicateurs</td>
+        <td colspan="2">6–11 mois</td>
+        <td colspan="2">12–59 mois</td>
+        <td colspan="2">60 mois et plus</td>
+        <td colspan="2">Total</td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td>F</td><td>M</td>
+        <td>F</td><td>M</td>
+        <td>F</td><td>M</td>
+        <td>F</td><td>M</td>
+    </tr>
+
+    <!-- Vitamine A 1ère dose -->
+    <tr>
+        <td>Vitamine A – 1ère dose</td>
+        {% for g, c in vitA100.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.F }}</td><td>{{ c.M }}</td>
+            {% endif %}
+        {% endfor %}
+        <td>{{ vitA100.TOTAL.F }}</td>
+        <td>{{ vitA100.TOTAL.M }}</td>
+    </tr>
+
+    <!-- Vitamine A 2ème dose -->
+    <tr>
+        <td>Vitamine A – 2ème dose</td>
+        {% for g, c in vitA200.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.F }}</td><td>{{ c.M }}</td>
+            {% endif %}
+        {% endfor %}
+        <td>{{ vitA200.TOTAL.F }}</td>
+        <td>{{ vitA200.TOTAL.M }}</td>
+    </tr>
+
+    <!-- Déparasitant -->
+    <tr>
+        <td>Déparasitant</td>
+        {% for g, c in deparasitant.items %}
+            {% if g != "TOTAL" %}
+                <td>{{ c.F }}</td><td>{{ c.M }}</td>
+            {% endif %}
+        {% endfor %}
+        <td>{{ deparasitant.TOTAL.F }}</td>
+        <td>{{ deparasitant.TOTAL.M }}</td>
+    </tr>
+</table>
 
 
   <!-- ============================= LAIT EN POUDRE ============================= -->
