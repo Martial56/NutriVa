@@ -9,12 +9,12 @@
 </head>
 <body>
 {% include 'patient/header.html' %}
-    <div class="container">
+    <div class="">
         <div class="header-bar-vaccin">
             <h1>Rendez-vous</h1>
         </div>
 
-        <form method="get" action="{% url 'liste_rdv' %}">
+        <form id="filtreForm" method="get" action="{% url 'liste_rdv' %}">
             {% csrf_token %}
             <div class="dates">
                 <label for="datedebut">Date de début</label>
@@ -25,9 +25,7 @@
             </div>
         </form>
 
-        <div class="list-title-container">
-            <span class="list-title">Liste</span>
-        </div>
+        
 
         <table class="appointment-table">
             <thead>
@@ -64,7 +62,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (!window.location.search) {
-                document.querySelector("form").submit();
+                document.getElementById("filtreForm").submit();
             }
         });
     </script>

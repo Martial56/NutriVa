@@ -111,23 +111,30 @@ nav ul li .dropdown a:hover {
 }
 
 /* -------------------------
-   BOUTON CONNECTION
+   BOUTON DECONNECTION
 --------------------------*/
-.btn_connexion {
-    background-color: #0066cc;
+/* Bouton logout stylé comme un lien de dropdown */
+.logout-btn {
+    width: 100%;
+    text-align: left;
+    background: none;
     border: none;
-    color: white;
-    padding: 10px 20px;
+    padding: 10px 15px;
     font-family: Arial;
-    border-radius: 2rem;
+    font-size: 15px;
+    color: red;
     cursor: pointer;
-    font-weight: bold;
+    border-radius: 0;
+    display: block;
     transition: 0.3s;
 }
 
-.btn_connexion:hover {
-    background-color: #e65b10;
+.logout-btn:hover {
+    background: #0066cc;
+    color: white !important;
+    text-transform: uppercase;
 }
+
 
 /* -------------------------
    PROFIL

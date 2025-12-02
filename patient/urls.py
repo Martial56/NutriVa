@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
+
 urlpatterns = [
     path('index', views.index, name="index"),
     path('ajouter/', views.creer_patient, name="creer_patient"),
@@ -15,6 +16,10 @@ urlpatterns = [
  # urls.py
     path('rechercher_patients/', views.rechercher_patients, name="rechercher_patients"),
     path("rapport/", views.rapports, name="rapport"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+    
+   # path('login/', auth_views.LoginView.as_view(template_name='patient/login.html'), name='login'),
+
  
     path("enregistrement_patient/", views.enregistrement_patient, name="enregistrement_patient"),
     path('enregistrement_constante/<int:patient_id>/', views.enregistrement_constante, name='enregistrement_constante'),

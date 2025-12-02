@@ -35,14 +35,15 @@
     }
   </style>
 </head>
-<body class="p-4">
+<body >
   {% include 'patient/header.html' %}
-<div class="container">
 
-  <h1 class="mb-4 text-center">Rapport Mensuel - Vaccination & Nutrition</h1>
+  <div class="header-bar-vaccin">
+        <h1>Rapport Mensuel - Vaccination & Nutrition</h1>
+    </div>
 
   <!-- Sélection de période -->
-  <form method="get" class="row g-3 mb-4">
+  <form method="get" class="row g-3 mb-4" style="margin-left: 20px;">
     <div class="col-md-3">
       <label for="date_debut" class="form-label">Date début</label>
       <input type="date" id="date_debut" name="date_debut" value="{{ date_debut|date:'Y-m-d' }}" class="form-control" required>
@@ -55,6 +56,10 @@
       <button type="submit" class="btn btn-primary w-100">Afficher le rapport</button>
     </div>
   </form>
+
+<div class="container">
+
+  
 
   {% if peses %}
   <!-- Boutons de téléchargement -->
@@ -299,7 +304,7 @@
     </tr>
 
     <!-- ======================== 5. ABANDON ======================== -->
-    <tr>
+      <tr>
         <td>Abandon</td>
         {% for g, c in abandon.items %}
             {% if g != "TOTAL" %}
@@ -307,7 +312,7 @@
             {% endif %}
         {% endfor %}
         <td>{{ tot_abandon.M }}</td><td>{{ tot_abandon.F }}</td>
-    </tr>
+      </tr>
 
     <!-- ======================== 6. DÉCÈS ======================== -->
     <tr>
@@ -320,116 +325,115 @@
         <td>{{ tot_deces.M }}</td><td>{{ tot_deces.F }}</td>
     </tr>
 
-  </table>
-<!-- ============================= DISTRIBUTION DE VITAMINE A ET depar ============================= -->
-<table class="table table-bordered text-center">
-    <tr class="table-secondary fw-bold">
-        <td>Indicateurs</td>
-        <td colspan="2">6–11 mois</td>
-        <td colspan="2">12–59 mois</td>
-        <td colspan="2">60 mois et plus</td>
-        <td colspan="2">Total</td>
-    </tr>
+    </table>
 
-    <tr>
-        <td></td>
-        <td>F</td><td>M</td>
-        <td>F</td><td>M</td>
-        <td>F</td><td>M</td>
-        <td>F</td><td>M</td>
-    </tr>
+    <!-- ============================= VITAMINE A ET DÉPARASITANT ============================= -->
+    <table class="table table-bordered text-center">
 
-    <!-- Vitamine A 1ère dose -->
-    <tr>
-        <td>Vitamine A – 1ère dose</td>
-        {% for g, c in vitA100.items %}
-            {% if g != "TOTAL" %}
-                <td>{{ c.F }}</td><td>{{ c.M }}</td>
-            {% endif %}
-        {% endfor %}
-        <td>{{ vitA100.TOTAL.F }}</td>
-        <td>{{ vitA100.TOTAL.M }}</td>
-    </tr>
+        <tr class="table-secondary fw-bold">
+            <td>Indicateurs</td>
+            <td colspan="2">6–11 mois</td>
+            <td colspan="2">12–59 mois</td>
+            <td colspan="2">60 mois et plus</td>
+            <td colspan="2">Total</td>
+        </tr>
 
-    <!-- Vitamine A 2ème dose -->
-    <tr>
-        <td>Vitamine A – 2ème dose</td>
-        {% for g, c in vitA200.items %}
-            {% if g != "TOTAL" %}
-                <td>{{ c.F }}</td><td>{{ c.M }}</td>
-            {% endif %}
-        {% endfor %}
-        <td>{{ vitA200.TOTAL.F }}</td>
-        <td>{{ vitA200.TOTAL.M }}</td>
-    </tr>
+        <tr>
+            <td></td>
+            <td>M</td><td>F</td>
+            <td>M</td><td>F</td>
+            <td>M</td><td>F</td>
+            <td>M</td><td>F</td>
+        </tr>
 
-    <!-- Déparasitant -->
-    <tr>
-        <td>Déparasitant</td>
-        {% for g, c in deparasitant.items %}
-            {% if g != "TOTAL" %}
-                <td>{{ c.F }}</td><td>{{ c.M }}</td>
-            {% endif %}
-        {% endfor %}
-        <td>{{ deparasitant.TOTAL.F }}</td>
-        <td>{{ deparasitant.TOTAL.M }}</td>
-    </tr>
-</table>
+        <!-- Vitamine A 1ère dose -->
+        <tr>
+            <td>Vitamine A – 1ère dose</td>
+            {% for g, c in vitA100.items %}
+                {% if g != "TOTAL" %}
+                    <td>{{ c.M }}</td><td>{{ c.F }}</td>
+                {% endif %}
+            {% endfor %}
+            <td>{{ vitA100.TOTAL.M }}</td>
+            <td>{{ vitA100.TOTAL.F }}</td>
+        </tr>
 
+        <!-- Vitamine A 2ème dose -->
+        <tr>
+            <td>Vitamine A – 2ème dose</td>
+            {% for g, c in vitA200.items %}
+                {% if g != "TOTAL" %}
+                    <td>{{ c.M }}</td><td>{{ c.F }}</td>
+                {% endif %}
+            {% endfor %}
+            <td>{{ vitA200.TOTAL.M }}</td>
+            <td>{{ vitA200.TOTAL.F }}</td>
+        </tr>
 
-  <!-- ============================= LAIT EN POUDRE ============================= -->
+        <!-- Déparasitant -->
+        <tr>
+            <td>Déparasitant</td>
+            {% for g, c in deparasitant.items %}
+                {% if g != "TOTAL" %}
+                    <td>{{ c.M }}</td><td>{{ c.F }}</td>
+                {% endif %}
+            {% endfor %}
+            <td>{{ deparasitant.TOTAL.M }}</td>
+            <td>{{ deparasitant.TOTAL.F }}</td>
+        </tr>
 
-  <table class="table table-bordered text-center mt-5">
+    </table>
 
-      <tr class="table-secondary fw-bold">
-          <td colspan="11">DISTRIBUTION DE LAIT EN POUDRE AUX ENFANTS POUR ÉVITER LA TRANSMISSION VIH</td>
-      </tr>
+    <!-- ============================= LAIT EN POUDRE ============================= -->
+    <table class="table table-bordered text-center mt-5">
 
-      <tr>
-          <td rowspan="2" class="fw-bold">Indicateurs</td>
-          <td colspan="2">0-5 mois</td>
-          <td colspan="2">6-11 mois</td>
-          <td colspan="2">12-23 mois</td>
-          <td colspan="2">24-59 mois</td>
-          <td colspan="2">Total par sexe</td>
-      </tr>
-      <tr>
-          {% for i in "12345" %}
-              <td>F</td><td>M</td>
-          {% endfor %}
-      </tr>
+        <tr class="table-secondary fw-bold">
+            <td colspan="11">DISTRIBUTION DE LAIT EN POUDRE AUX ENFANTS POUR ÉVITER LA TRANSMISSION VIH</td>
+        </tr>
 
-      <!-- ===================== 1. ENFANT AYANT BÉNÉFICIÉ DE LAIT ===================== -->
-      <tr>
-          <td>Nombre d'enfant ayant bénéficié de lait</td>
-          {% for g, c in lait.items %}
-              {% if g != "TOTAL" %}
-                  <td>{{ c.F }}</td><td>{{ c.M }}</td>
-              {% endif %}
-          {% endfor %}
-          <td>{{ lait.TOTAL.F }}</td>
-          <td>{{ lait.TOTAL.M }}</td>
-      </tr>
+        <tr>
+            <td rowspan="2" class="fw-bold">Indicateurs</td>
+            <td colspan="2">0-5 mois</td>
+            <td colspan="2">6-11 mois</td>
+            <td colspan="2">12-23 mois</td>
+            <td colspan="2">24-59 mois</td>
+            <td colspan="2">Total par sexe</td>
+        </tr>
 
-      <!-- ===================== 2. NOUVEAUX ENFANTS AYANT BÉNÉFICIÉ DE LAIT ===================== -->
-      <tr>
-          <td>Nombre de nouveau enfant ayant bénéficié de lait</td>
-          {% for g, c in lait_nouveaux.items %}
-              {% if g != "TOTAL" %}
-                  <td>{{ c.F }}</td><td>{{ c.M }}</td>
-              {% endif %}
-          {% endfor %}
-          <td>{{ lait_nouveaux.TOTAL.F }}</td>
-          <td>{{ lait_nouveaux.TOTAL.M }}</td>
-      </tr>
+        <tr>
+            {% for i in range %}
+                <td>M</td><td>F</td>
+            {% endfor %}
+        </tr>
 
-  </table>
+        <!-- 1. Enfants ayant bénéficié -->
+        <tr>
+            <td>Nombre d'enfant ayant bénéficié de lait</td>
+            {% for g, c in lait.items %}
+                {% if g != "TOTAL" %}
+                    <td>{{ c.M }}</td><td>{{ c.F }}</td>
+                {% endif %}
+            {% endfor %}
+            <td>{{ lait.TOTAL.M }}</td>
+            <td>{{ lait.TOTAL.F }}</td>
+        </tr>
 
+        <!-- 2. Nouveaux enfants -->
+        <tr>
+            <td>Nombre de nouveau enfant ayant bénéficié de lait</td>
+            {% for g, c in lait_nouveaux.items %}
+                {% if g != "TOTAL" %}
+                    <td>{{ c.M }}</td><td>{{ c.F }}</td>
+                {% endif %}
+            {% endfor %}
+            <td>{{ lait_nouveaux.TOTAL.M }}</td>
+            <td>{{ lait_nouveaux.TOTAL.F }}</td>
+        </tr>
 
-  {% else %}
-    <p class="alert alert-info">Aucune donnée disponible pour cette période.</p>
-  {% endif %}
-
-</div>
+    </table>
+    {% else %}
+      <div class="alert alert-info">Aucune donnée disponible pour la période sélectionnée.</div>
+      {% endif %} 
+    </div>
 </body>
 </html>

@@ -8,9 +8,12 @@ import calendar
 import io
 import json
 import ast
-from django.template.loader import render_to_string
+from django.template import loader
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Avg
+from django.utils.timezone import now
+from django.db.models.functions import TruncMonth
 
 
 try:
@@ -43,6 +46,7 @@ def constante(request, patient_id):
     return render(request, "patient/constante.html", {"patient": patient})
 
 #la vue pour la page rendez-vous
+#@login_required
 def rdv(request):
     return render(request, 'patient/rdv.html')
 
@@ -92,19 +96,29 @@ def liste_patients(request):
 
 # bouton rechercher dans la liste des patients
 def rechercher_patients(request):
-    query = request.GET.get('search')
-    patients = Patient.objects.all()
-    if query:
-        
-        patients = Patient.objects.filter(
-            Q(nom__icontains=query) |
-            Q(prenom__icontains=query)|
-            Q(telephone__icontains=query)
-        ).distinct()
-    context = {
+    query = request.GET.get("search", "").strip()
+
+    # Si l'utilisateur vide le champ, on retourne à la liste complète
+    if query == "":
+        return redirect('liste_patients')   # 👉 remplacer par ton URL d'affichage normal
+
+    # Sinon, filtrer
+    patients = Patient.objects.filter(
+        Q(nom__icontains=query) |
+        Q(prenom__icontains=query) |
+        Q(telephone__icontains=query) |
+        Q(quartier__icontains=query)
+    )
+
+    aucun_resultat = (not patients.exists())
+
+    return render(request, "patient/liste_patients.html", {
         "patients": patients,
-        "query": query,}
-    return render(request, "patient/liste_patients.html", context)
+        "query": query,
+        "aucun_resultat": aucun_resultat
+    })
+
+
 
 #Bouton enregistrer de la page création de patient
 def enregistrement_patient(request):
@@ -191,10 +205,10 @@ def liste_rdv(request):
     # 🔹 Construire la structure de données à afficher
     data = []
     for patient in patients:
-        constante = constantes.filter(patient=patient).first()
-        nutrition = nutritions.filter(patient=patient).first()
-        vaccination = vaccinations.filter(patient=patient).first()
-        rdv = rdvs.filter(patient=patient).first()
+        constante = constantes.filter(patient=patient).last()
+        nutrition = nutritions.filter(patient=patient).last()
+        vaccination = vaccinations.filter(patient=patient).last()
+        rdv = rdvs.filter(patient=patient).last()
 
         data.append({
             'patient': patient,
@@ -244,7 +258,8 @@ def enregistrement_nutrition(request, patient_id):
         date_sortie = request.POST.get("date_sortie") or None
         motif_sortie = request.POST.get("motif_sortie") or None
 
-        code_unique = f"NUT-{date.today().year}-{str(Nutrition.objects.count() + 1).zfill(4)}",
+        code_unique = f"NUT-{date.today().year}-{str(Nutrition.objects.count() + 1).zfill(4)}"
+
         date_visite = date.today()
         if nutrition:
             # Mise à jour
@@ -898,7 +913,7 @@ def rapports(request):
     elif fmt == "pdf":
         return _report_to_pdf(request, context)
     elif fmt == "html_download":
-        html = render_to_string("patient/rapport.html", context)
+        html = loader.render_to_string("patient/rapport.html", context)
         response = HttpResponse(html, content_type="text/html")
         response["Content-Disposition"] = f'attachment; filename="rapport_{start_date}_{end_date}.html"'
         return response
@@ -960,7 +975,7 @@ def _report_to_docx(context):
 def _report_to_pdf(request, context):
     if weasyprint is None:
         return HttpResponseBadRequest("WeasyPrint non installé.")
-    html = render_to_string("patient/rapport.html", context)
+    html = loader.render_to_string("patient/rapport.html", context)
     pdf = weasyprint.HTML(string=html).write_pdf()
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="rapport_{context["date_debut"]}_{context["date_fin"]}.pdf"'
@@ -993,3 +1008,67 @@ def historique_patient(request, patient_id):
     }
 
     return render(request, "patient/historique.html", context)
+
+###############################################################"
+# " tableau de bord
+################################################################
+
+def dashboard(request):
+    
+    month = request.GET.get("month")
+    # --- PATIENTS ---
+    total_patients = Patient.objects.count()
+    this_month_patients = Patient.objects.filter(date_creation__month=now().month).count()
+
+    # Répartition garçons / filles
+    sexe_stats = Patient.objects.values("sexe").annotate(total=Count("id"))
+
+    # --- VACCINATIONS ---
+    total_vaccins = Vaccination.objects.count()
+    vaccins_stats = Vaccination.objects.values("vaccin").annotate(total=Count("id")).order_by("-total")[:5]
+
+    # --- NUTRITION ---
+    depistage_total = Rdv.objects.count()
+    cas_positifs = Rdv.objects.filter(resultat="positif").count()
+
+    # Produits distribués
+    produits_totaux = {
+        "lait": 0,
+        "plumpy": 0,
+        "deparasitant": 0,
+        "vitA100": 0,
+        "vitA200": 0,
+    }
+
+    for rdv in Rdv.objects.all():
+        for p in rdv.produits:
+            if p in produits_totaux:
+                produits_totaux[p] += 1
+
+    # --- CONSTANTES (croissance) ---
+    poids_moyen = Constante.objects.aggregate(Avg("poids"))["poids__avg"]
+    taille_moyen = Constante.objects.aggregate(Avg("taille"))["taille__avg"]
+
+    # --- COURBE DES VISITES PAR MOIS ---
+    visites_mensuelles = (
+        Rdv.objects.annotate(month=TruncMonth("date_enregistrement"))
+        .values("month")
+        .annotate(total=Count("id"))
+        .order_by("month")
+    )
+
+    context = {
+        "total_patients": total_patients,
+        "this_month_patients": this_month_patients,
+        "sexe_stats": sexe_stats,
+        "total_vaccins": total_vaccins,
+        "vaccins_stats": vaccins_stats,
+        "depistage_total": depistage_total,
+        "cas_positifs": cas_positifs,
+        "produits_totaux": produits_totaux,
+        "poids_moyen": round(poids_moyen or 0, 1),
+        "taille_moyen": round(taille_moyen or 0, 1),
+        "visites_mensuelles": list(visites_mensuelles),
+    }
+
+    return render(request, "patient/dashboard.html", context)
