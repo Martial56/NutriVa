@@ -9,17 +9,18 @@
 </head>
 
 <body class="bg-light">
+    {% include 'patient/header.html' %}
+    <div class="header-bar-vaccin">
+        <h1>Tableau de bord</h1>
+    </div>
 
-<div class="container mt-4">
-
-    <h2 class="mb-4">📊 Tableau de bord - NutriVa</h2>
+<div class=" mt-4" style="margin: 20px; padding: 20px;">
     <!-- Menu de sélection du mois -->
     <form method="GET" class="mb-4">
     <div class="row">
         <div class="col-md-4">
             <select name="month" class="form-select" onchange="this.form.submit()">
                 <option value="">— Choisir un mois —</option>
-
                 <option value="1">Janvier</option>
                 <option value="2">Février</option>
                 <option value="3">Mars</option>
@@ -41,16 +42,16 @@
     <!-- KPIs -->
     <div class="row">
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-white bg-primary mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Patients</h5>
+                    <h5 class="card-title">Patients inscrits</h5>
                     <h3>{{ total_patients }}</h3>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-white bg-success mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Nouveaux (ce mois)</h5>
@@ -59,16 +60,34 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-white bg-warning mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Vaccinations</h5>
+                    <h5 class="card-title">Vaccins administrés</h5>
                     <h3>{{ total_vaccins }}</h3>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Malnutris pris en charge</h5>
+                    <h3>{{ malnutrition_total }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-white bg-danger-subtle mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Personnes dépistées</h5>
+                    <h3>{{ depistage_total }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
             <div class="card text-white bg-danger mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Cas positifs</h5>
@@ -78,23 +97,36 @@
         </div>
 
     </div>
-
+    <hr>
+    
     <!-- Graphiques -->
     <div class="row mt-4">
 
-        <div class="col-md-6">
-            <canvas id="sexChart"></canvas>
+        <!-- Colonne 1 : Graphique Sexe (4/12) -->
+        <div class=" card col-md-5 d-flex justify-content-center align-items-start">
+            <canvas id="sexChart" style="width:100%; max-height:550px;"></canvas>
         </div>
 
-        <div class="col-md-6">
-            <canvas id="produitsChart"></canvas>
+        <!-- Colonne 2 : 2 graphiques empilés (8/12) -->
+        <div class="col-md-7">
+
+            <!-- État Nutritionnel -->
+            <div class="card mb-4">
+                <canvas id="etatNutritionChart" style="width:100%; max-height:350px;"></canvas>
+            </div>
+
+            <!-- Produits -->
+            <div class="card">
+                <canvas id="produitsChart" style="width:100%; max-height:350px;"></canvas>
+            </div>
+
         </div>
 
     </div>
 
-    <div class="row mt-4">
+    <div class="card row mt-4">
         <div class="col-md-12">
-            <canvas id="visitesChart"></canvas>
+            <canvas id="visitesChart" style="width:100%; max-height:350px;"></canvas>
         </div>
     </div>
 
@@ -107,7 +139,7 @@
         labels: [{% for s in sexe_stats %}'{{ s.sexe }}',{% endfor %}],
         datasets: [{
             data: [{% for s in sexe_stats %}{{ s.total }},{% endfor %}],
-            backgroundColor: ['#36A2EB', '#FF6384'],
+            backgroundColor: ['#003366', '#01D758'],
         }]
     };
     new Chart(document.getElementById('sexChart'), {
@@ -116,7 +148,7 @@
     });
 
     // Produits chart
-    const produitsLabels = ['Lait','Plumpy','Déparasitant','Vit A100','Vit A200'];
+    const produitsLabels = ['Lait', 'Plumpy', 'Déparasitant', 'Vit A100', 'Vit A200'];
     const produitsValues = [
         {{ produits_totaux.lait }},
         {{ produits_totaux.plumpy }},
@@ -131,8 +163,20 @@
             labels: produitsLabels,
             datasets: [{
                 label: "Produits distribués",
-                data: produitsValues
+                data: produitsValues,
+                backgroundColor: '#003366',
+                borderColor: '#001f3f',
+                borderWidth: 1
             }]
+        },
+        options: {
+            indexAxis: 'y',  // ➤ Rend les barres horizontales
+            responsive: true,
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
         }
     });
 
@@ -149,6 +193,38 @@
                 data: visitesValues,
                 tension: 0.4
             }]
+        }
+    });
+
+    // État nutritionnel chart
+    const ctx = document.getElementById('etatNutritionChart');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{
+                label: "Nombre de cas",
+                data: {{ values|safe }},
+                backgroundColor: "#096A09",
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: {
+                    display: true,
+                    text: 'État Nutritionnel des Patients'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
         }
     });
 

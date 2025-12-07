@@ -74,7 +74,7 @@ class Rdv(models.Model):
     ]
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    depiste = models.CharField(max_length=5, choices=DEPISTE_CHOICES)
+    depiste = models.CharField(max_length=10, choices=DEPISTE_CHOICES)
     code_depistage = models.CharField(max_length=50, blank=True, null=True)
     resultat = models.CharField(max_length=10, choices=RESULTAT_CHOICES, blank=True, null=True)
     produits = models.JSONField(default=list)  # pour enregistrer plusieurs produits

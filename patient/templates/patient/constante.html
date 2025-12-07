@@ -111,8 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // LOGIQUE ÉTAT NUTRITIONNEL
         // -----------------------------
         switch (true) {
+            case (zscoreValue < -4):
+                indicec.value = "MAC";  // Malnutrition Aiguë Sévère avec complication
+                btnNutrition.classList.remove('disabled');
+                break;
             case (zscoreValue < -3):
-                indicec.value = "MAS";  // Malnutrition Aiguë Sévère
+                indicec.value = "MAS";  // Malnutrition Aiguë Sévère sans complication
                 btnNutrition.classList.remove('disabled');
                 break;
 

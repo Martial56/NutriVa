@@ -1014,24 +1014,46 @@ def historique_patient(request, patient_id):
 ################################################################
 
 def dashboard(request):
-    
     month = request.GET.get("month")
-    # --- PATIENTS ---
-    total_patients = Patient.objects.count()
-    this_month_patients = Patient.objects.filter(date_creation__month=now().month).count()
 
-    # Répartition garçons / filles
+    # --- PATIENTS ---
+    if month:
+        total_patients = Patient.objects.filter(date_creation__month=month).count()
+        this_month_patients = total_patients
+    else:
+        total_patients = Patient.objects.count()
+        this_month_patients = Patient.objects.filter(date_creation__month=now().month).count()
+
     sexe_stats = Patient.objects.values("sexe").annotate(total=Count("id"))
 
-    # --- VACCINATIONS ---
-    total_vaccins = Vaccination.objects.count()
-    vaccins_stats = Vaccination.objects.values("vaccin").annotate(total=Count("id")).order_by("-total")[:5]
+    # --- VACCINS ---
+    if month:
+        total_vaccins = Vaccination.objects.filter(date__month=month).count()
+        vaccins_stats = (
+            Vaccination.objects.filter(date__month=month)
+            .values("vaccin")
+            .annotate(total=Count("id"))
+            .order_by("-total")[:5]
+        )
+    else:
+        total_vaccins = Vaccination.objects.count()
+        vaccins_stats = Vaccination.objects.values("vaccin").annotate(total=Count("id")).order_by("-total")[:5]
 
-    # --- NUTRITION ---
-    depistage_total = Rdv.objects.count()
-    cas_positifs = Rdv.objects.filter(resultat="positif").count()
+    # --- DÉPISTAGE ---
+    if month:
+        depistage_total = Rdv.objects.filter(date_enregistrement__month=month).count()
+        cas_positifs = Rdv.objects.filter(date_enregistrement__month=month, resultat="positif").count()
+    else:
+        depistage_total = Rdv.objects.count()
+        cas_positifs = Rdv.objects.filter(resultat="positif").count()
+    # --- MALNUTRIS ---
+    if month:
+        malnutrition_total = Nutrition.objects.filter(date_admission__month=month).count()
+    else:
+        malnutrition_total  = Nutrition.objects.count()
+       
 
-    # Produits distribués
+    # --- PRODUITS DISTRIBUÉS ---
     produits_totaux = {
         "lait": 0,
         "plumpy": 0,
@@ -1040,22 +1062,46 @@ def dashboard(request):
         "vitA200": 0,
     }
 
-    for rdv in Rdv.objects.all():
+    rdv_query = Rdv.objects.all()
+    if month:
+        rdv_query = rdv_query.filter(date_enregistrement__month=month)
+
+    for rdv in rdv_query:
         for p in rdv.produits:
             if p in produits_totaux:
                 produits_totaux[p] += 1
 
-    # --- CONSTANTES (croissance) ---
-    poids_moyen = Constante.objects.aggregate(Avg("poids"))["poids__avg"]
-    taille_moyen = Constante.objects.aggregate(Avg("taille"))["taille__avg"]
+    # --- CONSTANTES ---
+    if month:
+        constantes = Constante.objects.filter(date__month=month)
+    else:
+        constantes = Constante.objects.all()
 
-    # --- COURBE DES VISITES PAR MOIS ---
+    poids_moyen = constantes.aggregate(Avg("poids"))["poids__avg"]
+    taille_moyen = constantes.aggregate(Avg("taille"))["taille__avg"]
+
+    # --- COURBE DES VISITES ---
     visites_mensuelles = (
-        Rdv.objects.annotate(month=TruncMonth("date_enregistrement"))
+        Constante.objects.annotate(month=TruncMonth("date"))
         .values("month")
         .annotate(total=Count("id"))
         .order_by("month")
     )
+
+    # --- ÉTAT NUTRITIONNEL ---
+    LABELS_MAP = {
+        "MAM": "Modéré",
+        "MAS": "Sévère sans complication",
+        "MAC": "Sévère avec complication",
+        "Obésité": "Obésité",
+        "Surpoids": "Surpoids",
+        "Normal": "Normal",
+    }
+
+    raw_data = constantes.values('indicecorporel').annotate(total=Count('id')).order_by('indicecorporel')
+
+    labels = [LABELS_MAP.get(item["indicecorporel"], item["indicecorporel"]) for item in raw_data]
+    values = [item["total"] for item in raw_data]
 
     context = {
         "total_patients": total_patients,
@@ -1069,6 +1115,10 @@ def dashboard(request):
         "poids_moyen": round(poids_moyen or 0, 1),
         "taille_moyen": round(taille_moyen or 0, 1),
         "visites_mensuelles": list(visites_mensuelles),
+        "labels": labels,
+        "values": values,
+        "malnutrition_total": malnutrition_total,
+        "selected_month": month or "",
     }
 
     return render(request, "patient/dashboard.html", context)
