@@ -370,7 +370,8 @@ def rapports(request):
     #total_peses = sum(p["TOTAL"] for p in peses.values())
     
      # --- 🧒 Nouveaux enfants (première visite / création du patient) ---
-    nouveaux_patients = Patient.objects.filter(date_creation__range=(start_date, end_date))
+    nouveaux_patients = Patient.objects.filter(date_creation__range=(start_date, end_date), vaccination__date__range=(start_date, end_date)
+).distinct()
 
     premieres_visites = {g: {"M": 0, "F": 0, "TOTAL": 0} for g in age_groups}
     total_premieres_visites = {"M": 0, "F": 0, "TOTAL": 0}
@@ -454,7 +455,7 @@ def rapports(request):
             total_surpoids["TOTAL"] += 1
 
     # --- 🟩 Enfants vus en séance de vaccination PEV (routine) ---
-        patient_ids = (
+    patient_ids = (
         Vaccination.objects
         .filter(date__range=(start_date, end_date))
         .values_list("patient_id", flat=True)
@@ -499,10 +500,11 @@ def rapports(request):
         total_pev_routine["TOTAL"] += 1
          # ---- 1️⃣ MILDA ----
         if "eabmilda" in entry.vaccin.lower():
-            milda[g][sexe] += 1
-            milda[g]["TOTAL"] += 1
+            milda[groupe][sexe] += 1
+            milda[groupe]["TOTAL"] += 1
             total_milda[sexe] += 1
             total_milda["TOTAL"] += 1
+
         # --- 🟩 Rdv PEV : MILDA, dépistés, dépistés positifs ---
 
     # 1. Charger les enregistrements RDV dans la période

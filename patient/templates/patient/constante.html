@@ -34,22 +34,22 @@
                     <input type="date" id="date" name="date" value="{{ today|date:'Y-m-d' }}">
 
                     <label for="taille">Taille (cm)</label>
-                    <input type="text" id="taille" name="taille" inputmode="numeric" maxlength="4" pattern="[0-9]*">
+                    <input type="text" id="taille" name="taille" inputmode="numeric" maxlength="4" pattern="[0-9]*" required>
 
                     <label for="poids">Poids (kg)</label>
-                    <input type="text" id="poids" name="poids" inputmode="numeric" maxlength="3" pattern="[0-9]*">
+                    <input type="text" id="poids" name="poids" inputmode="numeric" maxlength="3" pattern="[0-9]*" required>
 
                     <label for="pb">P. B.</label>
-                    <input type="text" id="pb" name="pb" inputmode="numeric" maxlength="3" pattern="[0-9]*">
+                    <input type="text" id="pb" name="pb" inputmode="numeric" maxlength="3" pattern="[0-9]*" required>
 
                     <label for="imc">IMC</label>
                     <input type="text" id="imc" name="imc" inputmode="numeric" maxlength="3" pattern="[0-9\-\.]*" readonly>
 
                     <label for="zscore">Z-score</label>
-                    <input type="text" id="zscore" name="zscore" inputmode="numeric" maxlength="3" pattern="[0-9\-\.]*">
+                    <input type="text" id="zscore" name="zscore" inputmode="numeric" maxlength="3" pattern="[0-9\-\.]*" required>
 
                     <label for="indicec">Indice C</label>
-                    <input type="text" id="indicec" name="indicec">
+                    <input type="text" id="indicec" name="indicec" readonly>
                 </div>
 
                 <div class="button-group">
@@ -115,27 +115,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 indicec.value = "MAC";  // Malnutrition Aiguë Sévère avec complication
                 btnNutrition.classList.remove('disabled');
                 break;
-            case (zscoreValue < -3):
+            case (zscoreValue == -3):
                 indicec.value = "MAS";  // Malnutrition Aiguë Sévère sans complication
                 btnNutrition.classList.remove('disabled');
                 break;
 
-            case (zscoreValue >= -3 && zscoreValue < -2):
+            case (zscoreValue >= -2 && zscoreValue < -1):
                 indicec.value = "MAM";  // Malnutrition Aiguë Modérée
                 btnNutrition.classList.remove('disabled');
                 break;
 
-            case (zscoreValue >= -2 && zscoreValue <= 1):
+            case (zscoreValue >= 0 && zscoreValue <= 1):
                 indicec.value = "Normal";
                 btnNutrition.classList.add('disabled');
                 break;
 
             case (zscoreValue > 1 && zscoreValue <= 2):
+                indicec.value = "Risque de Surpoids";
+                btnNutrition.classList.remove('disabled');
+                break;
+            case (zscoreValue > 2 && zscoreValue <= 3):
                 indicec.value = "Surpoids";
                 btnNutrition.classList.remove('disabled');
                 break;
 
-            case (zscoreValue > 2):
+            case (zscoreValue > 3):
                 indicec.value = "Obésité";
                 btnNutrition.classList.remove('disabled');
                 break;
