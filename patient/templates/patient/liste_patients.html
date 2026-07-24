@@ -6,8 +6,8 @@
     <title>Patients – Vue Kanban</title>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
 </head>
 <body class="liste_body">
     {% include 'patient/header.html' %}
@@ -32,29 +32,43 @@
     </nav>
 
     <!-- Grid Kanban -->
-    <div class="row ">
-        {% for patient in patients %}
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <a href="{% url 'historique_patient' patient.id %}" class="text-decoration-none text-dark">
-                    <div class="patient-card kanban">
-                        <img src="{% static 'images/person.png' %}" alt="Photo du patient" class="img-fluid rounded-circle" width="90" height="90">
-                        <div class="patient-name">{{ patient.nom }} {{ patient.prenom }}</div>
-                        <div class="text-muted small">{{ patient.age }} Mois</div>
-                        <div class="text-muted small">{{ patient.sexe }}</div>
-                        <div>{{ patient.quartier }}</div>
-                        <div>{{ patient.telephone }}</div>
-                        <div class="mt-2">
-                            <a href="{% url 'constante' patient.id %}"><button class="btn btn-sm btn-secondary">Prise de constante</button></a>
+    <div class="container-fluid px-3 pt-3">
+        <div class="row g-2">
+            {% for patient in patients %}
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <a href="{% url 'historique_patient' patient.id %}" class="text-decoration-none text-dark d-block">
+                        <div class="patient-card kanban text-center">
+                            <img src="{% static 'images/person.png' %}" alt="Photo" class="rounded-circle" width="50" height="50">
+                            <div class="patient-name">{{ patient.nom }} {{ patient.prenom }}</div>
+                            <div class="patient-meta">
+                                <span>{{ patient.age }} mois</span> &middot;
+                                <span>{{ patient.sexe }}</span>
+                            </div>
+                            <div class="patient-meta text-truncate" title="{{ patient.quartier }}">{{ patient.quartier }}</div>
+                            {% if patient.telephone %}
+                                <div class="patient-meta">{{ patient.telephone }}</div>
+                            {% endif %}
+                            <div>
+                                {% if patient.statut == "FE_FA" %}
+                                    <a href="{% url 'vaccination' patient.id %}" onclick="event.stopPropagation()">
+                                        <button class="btn btn-success btn-action">VAT</button>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'constante' patient.id %}" onclick="event.stopPropagation()">
+                                        <button class="btn btn-secondary btn-action">Constante</button>
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
 
-        {% empty %}
-        <div class="col-12">
-            <p class="text-center">Aucun patient enregistré</p>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center text-muted mt-4">Aucun patient enregistré</p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

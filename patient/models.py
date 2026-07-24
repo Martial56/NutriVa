@@ -11,6 +11,7 @@ class Patient(models.Model):
     nom_parent= models.CharField(max_length=100)
     quartier = models.CharField(max_length=100)
     telephone = models.CharField(max_length=20, blank=True, null=True)
+    statut = models.CharField(max_length=100)  # False pour enfant, True pour femme enceinte/allaitante
 
     def __str__(self):
         return f"{self.prenom} {self.nom}"
@@ -38,7 +39,18 @@ class Vaccination(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     date = models.DateField()
     vaccin= models.CharField(max_length=500)
-    
+
+    @property
+    def vaccins_liste(self):
+        import ast
+        try:
+            items = ast.literal_eval(self.vaccin)
+            if isinstance(items, list):
+                return ", ".join(items)
+        except Exception:
+            pass
+        return self.vaccin
+
     def __str__(self):
         return f"Vaccination {self.vaccin} de {self.patient} le {self.date}"
     
@@ -61,8 +73,8 @@ class Rdv(models.Model):
     ]
 
     DEPISTE_CHOICES = [
-        ("oui", "Oui"),
-        ("non", "Non"),
+        ("oui", "oui"),
+        ("non", "non"),
     ]
 
     PRODUITS_CHOICES = [
@@ -74,7 +86,7 @@ class Rdv(models.Model):
     ]
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    depiste = models.CharField(max_length=10, choices=DEPISTE_CHOICES)
+    depiste = models.CharField(max_length=10, choices=DEPISTE_CHOICES, default="non")
     code_depistage = models.CharField(max_length=50, blank=True, null=True)
     resultat = models.CharField(max_length=10, choices=RESULTAT_CHOICES, blank=True, null=True)
     produits = models.JSONField(default=list)  # pour enregistrer plusieurs produits

@@ -5,13 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
     <title>Formulaire Rendez-vous</title>
+
 </head>
 <body>
 {% include 'patient/header.html' %}
     <div class="">
         <div class="header-bar-vaccin">
             <h1>Rendez-vous</h1>
+            <a href="{% url 'export_excel' %}?datedebut={{ date_debut|date:'Y-m-d' }}&datefin={{ date_fin|date:'Y-m-d' }}" class="download-btn" title="Exporter en Excel">
+                <i class="fas fa-download"></i>
+            </a>
         </div>
 
         <form id="filtreForm" method="get" action="{% url 'liste_rdv' %}">
@@ -35,7 +43,8 @@
                     <th>État nutritionnel</th>
                     <th>Apports nutritionnel</th>
                     <th>Vaccins reçus</th>
-                    <th>Action</th> 
+                    <th>Action</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -44,16 +53,24 @@
                     <td>{{ d.constante.date|date:"d/m/Y"|default:"-" }}</td>
                     <td>{{ d.patient.nom }} {{ d.patient.prenom }}</td>
                     <td>{{ d.nutrition.etat_nutrition|default:"-" }}</td>
-                    <td>{{ d.rdv.produits_list }}</td>
-                    <td>{{ d.vaccination.vaccin|default:"-" }}</td>
+                    <td>
+                        {% if d.rdv %}
+                            {{ d.rdv.produits_list }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <td>{{ d.vaccination.vaccins_liste|default:"-" }}</td>
                     <td>
                         <a href="{% url 'vaccination' d.patient.id %}"><button class="vaccin-button">Vaccin</button></a>
                         <a href="{% url 'nutrition' d.patient.id %}"><button class="nutrition-button">Nutrition</button></a>
                     </td>
+                    
                 </tr>
                 
                 {% empty %}
-                    <tr><td colspan="7">Aucun patient trouvé.</td></tr>
+                    <tr><td colspan="6">Aucun patient trouvé.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

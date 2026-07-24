@@ -24,7 +24,7 @@
             <div class="patient-details">
                 <i class="fas fa-user-circle profile-icon"></i>
                 <span class="patient-name">{{patient.nom}} {{patient.prenom}}</span>
-                <span class="patient-age">{{patient.age}} Mois</span>
+                <span class="patient-age">{{age_affichage}}</span>
                 <span class="patient-sex">{{patient.sexe}}</span>
             </div>
         </div>
@@ -113,84 +113,125 @@
     </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", () => {
 
-          // Récupération de l'âge réel en mois (numérique)
-          const agePatient = Number("{{patient.age }}");  
-          console.log("Âge patient (mois) =", agePatient);
+          /* ===============================
+            1. DATE DE NAISSANCE
+            =============================== */
+          const dateNaissanceStr = "{{ patient.date_naissance|date:'Y-m-d' }}";
+          const dateNaissance = new Date(dateNaissanceStr);
+          const aujourdHui = new Date();
+          const statutPatient = "{{ patient.statut }}";
 
-          // Id → âge minimum requis
+          if (isNaN(dateNaissance)) {
+              console.error("Date de naissance invalide");
+              return;
+          }
+
+          /* ===============================
+            2. CALCUL DE L'ÂGE EN MOIS
+            =============================== */
+          const diffMs = aujourdHui - dateNaissance;
+          const diffJours = diffMs / (1000 * 60 * 60 * 24);
+
+          // 1 mois médical ≈ 30,4375 jours
+          const ageMois = diffJours / 30.4375;
+
+          console.log("Âge patient (mois) =", ageMois.toFixed(2));
+
+          /* ===============================
+            3. ÂGE MINIMUM PAR VACCIN
+            =============================== */
           const ageRequired = {
-              "v_dtch_0": 0,
-              "v_bcg": 0,
-              "v_vpo0": 0,
+              v_dtch_0: 0,
+              v_bcg: 0,
+              v_vpo0: 0,
 
-              "v_dtch_1": 6,
-              "v_pcv1": 6,
-              "v_vpo1": 6,
-              "v_rota1": 6,
-              "v_vpi1": 6,
-              "v_vaxigrip": 6,
-              
+              v_dtch_1: 1.5,
+              v_pcv1: 1.5,
+              v_vpo1: 1.5,
+              v_rota1: 1.5,
+              v_vpi1: 1.5,
+              v_vaxigrip: 1.5,
 
-              "v_dtch_2": 10,
-              "v_pcv2": 10,
-              "v_vpo2": 10,
-              "v_rota2": 10,
+              v_dtch_2: 2.5,
+              v_pcv2: 2.5,
+              v_vpo2: 2.5,
+              v_rota2: 2.5,
 
-              "v_dtch_3": 14,
-              "v_pcv3": 14,
-              "v_vpo3": 14,
-              "v_vpi2": 14,
+              v_dtch_3: 3.5,
+              v_pcv3: 3.5,
+              v_vpo3: 3.5,
+              v_vpi2: 3.5,
 
-              "v_vap1": 24,
-              "v_vap2": 32,
+              v_vap1: 6,
+              v_vap2: 8,
 
-              "v_rr1": 9,
-              "v_vaa": 9,
-              "v_mena": 9,
-              "v_vap3": 9,
-              "v_vam" : 9,
+              v_rr1: 9,
+              v_vaa: 9,
+              v_mena: 9,
+              v_vap3: 9,
+              v_vam: 9,
 
-              "v_rr2": 15,
-              "v_vap4": 15,
-              "v_ecv": 15,
+              v_rr2: 15,
+              v_vap4: 15,
+              v_ecv: 15,
 
-              "v_hpv": 108
+              v_hpv: 108
           };
 
-          // Liste des vaccins déjà faits
-          const vaccinsDejaFaits = JSON.parse('{{ vaccins_faits_json|safe }}');
+          /* ===============================
+            4. VACCINS DÉJÀ ADMINISTRÉS
+            =============================== */
+          let vaccinsDejaFaits = [];
+          try {
+              vaccinsDejaFaits = JSON.parse('{{ vaccins_faits_json|safe }}');
+          } catch (e) {
+              console.warn("Erreur parsing vaccins_faits_json");
+          }
 
-          console.log("Vaccins déjà faits =", vaccinsDejaFaits);
-
-          // Parcourir toutes les cases
-          Object.keys(ageRequired).forEach(id => {
+          /* ===============================
+            5. APPLICATION DES RÈGLES
+            =============================== */
+          Object.entries(ageRequired).forEach(([id, ageMin]) => {
 
               const checkbox = document.getElementById(id);
               if (!checkbox) return;
 
-              const vaccinValue = checkbox.value;
+              const vaccinCode = checkbox.value;
 
-              // 1️⃣ Blocage si vaccin déjà fait
-              if (vaccinsDejaFaits.includes(vaccinValue)) {
+              // RÈGLE : Statut FE_FA (Grise tout)
+              if (statutPatient === "FE_FA") {
                   checkbox.disabled = true;
+                  checkbox.checked = false; // Optionnel : décocher si c'est FE_FA
+                  checkbox.classList.add("vaccin-grise-fefa");
+                  return; // On passe au vaccin suivant
+              }
+
+              // Vaccin déjà fait
+              if (vaccinsDejaFaits.includes(vaccinCode)) {
                   checkbox.checked = true;
+                  checkbox.disabled = true;
+                  checkbox.classList.add("vaccin-fait");
                   return;
               }
 
-              // 2️⃣ Blocage si âge insuffisant
-              const ageMin = ageRequired[id];
-
-              if (agePatient < ageMin) {
+              // Âge insuffisant
+              if (ageMois < ageMin) {
+                  checkbox.checked = false;
                   checkbox.disabled = true;
-                  checkbox.checked = false; // sécurité
+                  checkbox.classList.add("vaccin-non-eligible");
+                  return;
               }
 
+              // Vaccin éligible
+              checkbox.disabled = false;
+              checkbox.classList.add("vaccin-eligible");
           });
 
       });
-      </script>
+    </script>
+
 
 
 

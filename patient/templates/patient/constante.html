@@ -21,7 +21,7 @@
             <div class="patient-details">
                 <i class="fas fa-user-circle profile-icon"></i>
                 <span class="patient-name">{{patient.nom}} {{patient.prenom}}</span>
-                <span class="patient-age">{{patient.age}} Mois</span>
+                <span class="patient-age">{{age_affichage}}</span>
                 <span class="patient-sex">{{patient.sexe}}</span>
             </div>
         </div>
@@ -46,7 +46,7 @@
                     <input type="text" id="imc" name="imc" inputmode="numeric" maxlength="3" pattern="[0-9\-\.]*" readonly>
 
                     <label for="zscore">Z-score</label>
-                    <input type="text" id="zscore" name="zscore" inputmode="numeric" maxlength="3" pattern="[0-9\-\.]*" required>
+                    <input type="text" id="zscore" name="zscore" inputmode="numeric" maxlength="4" pattern="[0-9\-\.]*" required>
 
                     <label for="indicec">Indice C</label>
                     <input type="text" id="indicec" name="indicec" readonly>
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // LOGIQUE ÉTAT NUTRITIONNEL
         // -----------------------------
         switch (true) {
-            case (zscoreValue < -4):
+            case (zscoreValue <= -4):
                 indicec.value = "MAC";  // Malnutrition Aiguë Sévère avec complication
                 btnNutrition.classList.remove('disabled');
                 break;
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnNutrition.classList.remove('disabled');
                 break;
 
-            case (zscoreValue >= -2 && zscoreValue < -1):
+            case (zscoreValue >= -2 && zscoreValue <= -1):
                 indicec.value = "MAM";  // Malnutrition Aiguë Modérée
                 btnNutrition.classList.remove('disabled');
                 break;

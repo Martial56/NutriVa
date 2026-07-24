@@ -1,20 +1,29 @@
 from django.shortcuts import render, redirect, get_object_or_404
 #from .forms import PatientForm
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, StreamingHttpResponse
 from .models import Patient, Constante, Vaccination, Rdv, Nutrition
 from datetime import datetime, date
 import calendar
 import io
 import json
 import ast
+import os
+import zipfile
+from django.conf import settings
+from django.contrib import messages
+from docx import Document
+from docx.shared import Pt
 from django.template import loader
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg
-from django.utils.timezone import now
+from django.utils.timezone import now, localtime
 from django.db.models.functions import TruncMonth
-
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment
+import tempfile
+from django.http import FileResponse
 
 try:
     from docx import Document
@@ -43,7 +52,14 @@ def creer_patient(request):
 #la vue pour la page de saisie des constantes
 def constante(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
-    return render(request, "patient/constante.html", {"patient": patient})
+    today = date.today()
+    years = today.year - patient.date_naissance.year
+    months = today.month - patient.date_naissance.month
+    if months < 0:
+        years -= 1
+        months += 12
+    age_affichage = f"{years} ans {months} mois"
+    return render(request, "patient/constante.html", {"patient": patient, "age_affichage": age_affichage})
 
 #la vue pour la page rendez-vous
 #@login_required
@@ -53,6 +69,13 @@ def rdv(request):
 #la vue pour la page de saisie des vaccinations
 def vaccination(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
+    today = date.today()
+    years = today.year - patient.date_naissance.year
+    months = today.month - patient.date_naissance.month
+    if months < 0:
+        years -= 1
+        months += 12
+    age_affichage = f"{years} ans {months} mois"
 
     vaccins_faits_raw = Vaccination.objects.filter(patient=patient).values_list('vaccin', flat=True)
 
@@ -74,7 +97,7 @@ def vaccination(request, patient_id):
 
     return render(request, 'patient/vaccination.html', {
         "patient": patient,
-        "age_mois": patient.age,
+        "age_affichage": age_affichage,
         "vaccins_faits_json": json.dumps(vaccins_faits),
     })
 
@@ -82,10 +105,18 @@ def vaccination(request, patient_id):
 def nutrition(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
     nutrition = Nutrition.objects.filter(patient=patient).first()
+    today = date.today()
+    years = today.year - patient.date_naissance.year
+    months = today.month - patient.date_naissance.month
+    if months < 0:
+        years -= 1
+        months += 12
+    age_affichage = f"{years} ans {months} mois"
     
     context = {
         "patient": patient,
         "nutrition": nutrition,
+        "age_affichage": age_affichage,
     }
     return render(request, 'patient/nutrition.html', context)
 
@@ -130,6 +161,7 @@ def enregistrement_patient(request):
         nom_parent = request.POST.get('nom_parent')
         quartier = request.POST.get('quartier')
         telephone = request.POST.get('phone')
+        statut = request.POST.get('statut')
         
         date_creation = date.today()
         patient = Patient(
@@ -141,7 +173,8 @@ def enregistrement_patient(request):
             sexe=sexe,
             nom_parent=nom_parent,
             quartier=quartier,
-            telephone=telephone
+            telephone=telephone,
+            statut=statut,
         )
         patient.save()
         return redirect('liste_patients')  # Rediriger vers la liste des patients après l'enregistrement
@@ -200,7 +233,7 @@ def liste_rdv(request):
     # 🔹 Récupérer les nutritions et vaccinations liées à ces patients
     nutritions = Nutrition.objects.filter(patient_id__in=patients_ids, date_visite__range=[date_debut, date_fin])
     vaccinations = Vaccination.objects.filter(patient_id__in=patients_ids, date__range=[date_debut, date_fin])
-    rdvs = Rdv.objects.filter(patient_id__in=patients_ids, date_enregistrement__range=[date_debut, date_fin])
+    rdvs = Rdv.objects.filter(patient_id__in=patients_ids,  date_enregistrement__date__range=[date_debut, date_fin])
 
     # 🔹 Construire la structure de données à afficher
     data = []
@@ -300,7 +333,7 @@ def enregistrer_apport_nutrition(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
 
     if request.method == "POST":
-        depiste = request.POST.get("depiste") or None
+        depiste = request.POST.get("depiste", "non").lower()
         code_depistage = request.POST.get("code_depistage") or None
         resultat = request.POST.get("resultat") or None
         produits = request.POST.getlist("produits") or None  # car c’est une liste de checkboxes
@@ -914,6 +947,9 @@ def rapports(request):
         return _report_to_docx(context)
     elif fmt == "pdf":
         return _report_to_pdf(request, context)
+    elif fmt == "excel":
+        return export_rapport_excel(context)
+
     elif fmt == "html_download":
         html = loader.render_to_string("patient/rapport.html", context)
         response = HttpResponse(html, content_type="text/html")
@@ -922,54 +958,442 @@ def rapports(request):
 
     return render(request, "patient/rapport.html", context)
 
+# Fonction utilitaire pour ajouter une table simple dans le document
+def add_simple_table(doc, headers, rows):
+    table = doc.add_table(rows=1, cols=len(headers))
+    for i, h in enumerate(headers):
+        table.rows[0].cells[i].text = h
+
+    for row in rows:
+        cells = table.add_row().cells
+        for i, val in enumerate(row):
+            cells[i].text = str(val)
 
 # Génération DOCX
 def _report_to_docx(context):
     if Document is None:
         return HttpResponseBadRequest("python-docx n'est pas installé.")
+
     doc = Document()
-    doc.add_heading(f"Rapport du {context['date_debut']} au {context['date_fin']}", level=1)
 
-    doc.add_heading("Séances de pesée", level=2)
-    t = doc.add_table(rows=1, cols=4)
-    hdr = t.rows[0].cells
-    hdr[0].text = "Tranche"
-    hdr[1].text = "M"
-    hdr[2].text = "F"
-    hdr[3].text = "Total"
-    for g, c in context["peses"].items():
-        row = t.add_row().cells
-        row[0].text = g
-        row[1].text = str(c["M"])
-        row[2].text = str(c["F"])
-        row[3].text = str(c["TOTAL"])
+    # =====================================================
+    # TITRE
+    # =====================================================
+    doc.add_heading(
+        f"Rapport mensuel Vaccination & Nutrition\n"
+        f"Période : {context['date_debut']} au {context['date_fin']}",
+        level=1
+    )
 
-    doc.add_heading("Vaccinations", level=2)
-    t2 = doc.add_table(rows=1, cols=2)
-    t2.rows[0].cells[0].text = "Antigène"
-    t2.rows[0].cells[1].text = "Nombre"
-    for ag, n in context["antigen_counts"].items():
-        r = t2.add_row().cells
-        r[0].text = ag
-        r[1].text = str(n)
+    # =====================================================
+    # 1 & 2. ÉVALUATION NUTRITIONNELLE + VACCINATION DE ROUTINE (tableau unique)
+    # =====================================================
+    doc.add_heading("Évaluation nutritionnelle", level=2)
 
-    doc.add_heading("Produits distribués", level=2)
-    t3 = doc.add_table(rows=1, cols=2)
-    t3.rows[0].cells[0].text = "Produit"
-    t3.rows[0].cells[1].text = "Quantité"
-    for p, n in context["produit_counts"].items():
-        r = t3.add_row().cells
-        r[0].text = p
-        r[1].text = str(n)
+    NUM_COLS = 13  # SEXE + 4 tranches × 2 (M/F) + sous-total M/F + Total + Total référé
+    headers_eval = [
+        "SEXE",
+        "0-5 M", "0-5 F",
+        "6-11 M", "6-11 F",
+        "12-23 M", "12-23 F",
+        "24-59 M", "24-59 F",
+        "Sous-total M", "Sous-total F",
+        "Total", "Total référé"
+    ]
 
-    bio = io.BytesIO()
-    doc.save(bio)
-    bio.seek(0)
+    def mk_eval_row(label, data, total):
+        row = [label]
+        for c in data.values():
+            row.extend([c["M"], c["F"]])
+        row += [total["M"], total["F"], total["TOTAL"], ""]
+        return row
+
+    table1 = doc.add_table(rows=1, cols=NUM_COLS)
+    table1.style = "Table Grid"
+    for i, h in enumerate(headers_eval):
+        table1.rows[0].cells[i].text = h
+
+    for label, data_key, total_key in [
+        ("Nombre d'enfants pesés", "peses", "total_peses"),
+        ("Nombre d'enfants venus pour la première fois à une séance de vaccination",
+         "premieres_visites", "total_premieres_visites"),
+        ("Nombre d'enfants en surpoids", "surpoids", "total_surpoids"),
+        ("Nombre d'enfants obèses (Obésité)", "obeses", "total_obeses"),
+        ("Malnutrition aiguë modérée (MAM)", "mam", "total_mam"),
+        ("Malnutrition aiguë sévère sans complication", "mas", "total_mas"),
+    ]:
+        r = table1.add_row()
+        for i, val in enumerate(mk_eval_row(label, context[data_key], context[total_key])):
+            r.cells[i].text = str(val)
+
+    # Ligne de section "Vaccination de routine"
+    sec_row = table1.add_row()
+    sec_row.cells[0].merge(sec_row.cells[NUM_COLS - 1])
+    sec_row.cells[0].text = "Vaccination de routine"
+
+    for label, data_key, total_key in [
+        ("Nombre d'enfants vus en séance de vaccination PEV de routine",
+         "pev_routine", "total_pev_routine"),
+        ("Nombre d'enfants ayant reçu une MILDA en PEV", "milda", "total_milda"),
+        ("Nombre d'enfants dépistés au PEV", "depistes", "total_depistes"),
+        ("Nombre d'enfants dépistés et déclarés positifs au PEV", "positifs", "total_positifs"),
+    ]:
+        r = table1.add_row()
+        for i, val in enumerate(mk_eval_row(label, context[data_key], context[total_key])):
+            r.cells[i].text = str(val)
+
+    # Ligne "Total des mères"
+    meres_row = table1.add_row()
+    meres_row.cells[0].merge(meres_row.cells[NUM_COLS - 1])
+    meres_row.cells[0].text = (
+        "Total des mères venues pour la première fois aux activités "
+        "(Ne pas compter la même personne deux fois)"
+    )
+
+    # =====================================================
+    # 3. DÉTAILS DES VACCINATIONS
+    # =====================================================
+    doc.add_heading("Détails des vaccinations effectuées", level=2)
+
+    add_simple_table(
+        doc,
+        ["Antigène", "Nombre d’enfants vaccinés"],
+        [(ag, n) for ag, n in context["antigen_counts"].items()]
+    )
+
+    # =====================================================
+    # 4. PRODUITS NUTRITIONNELS DISTRIBUÉS
+    # =====================================================
+    doc.add_heading("Produits nutritionnels distribués", level=2)
+
+    add_simple_table(
+        doc,
+        ["Produit", "Quantité distribuée"],
+        [(p, n) for p, n in context["produit_counts"].items()]
+    )
+
+    # =====================================================
+    # 5. PRISE EN CHARGE DE LA MALNUTRITION AIGUË
+    # =====================================================
+    doc.add_heading("Prise en charge de la malnutrition aiguë", level=2)
+
+    headers_mal = ["Indicateur"]
+    for g in context["mas_pris"]:
+        if g != "TOTAL":
+            headers_mal.extend([f"{g} M", f"{g} F"])
+    headers_mal.extend(["Total M", "Total F"])
+
+    def mal_row(label, data, total):
+        row = [label]
+        for g, c in data.items():
+            if g != "TOTAL":
+                row.extend([c["M"], c["F"]])
+        row.extend([total["M"], total["F"]])
+        return row
+
+    rows_mal = [
+        mal_row("Nombre de malnutris sans complication pris en charge", context["mas_pris"], context["tot_mas_pris"]),
+        mal_row("Nombre de malnutris modéré pris en charge", context["mam_pris"], context["tot_mam_pris"]),
+        mal_row("Nombre de malnutris sans complication déclarés guéris", context["mas_gueris"], context["tot_mas_gueris"]),
+        mal_row("Nombre de malnutris modéré déclarés guéris", context["mam_gueris"], context["tot_mam_gueris"]),
+        mal_row("Abandon", context["abandon"], context["tot_abandon"]),
+        mal_row("Décès", context["deces"], context["tot_deces"]),
+    ]
+
+    add_simple_table(doc, headers_mal, rows_mal)
+
+    # =====================================================
+    # 6. VITAMINE A & DÉPARASITANT
+    # =====================================================
+    doc.add_heading("Vitamine A et Déparasitant", level=2)
+
+    vit_headers = ["Indicateur"]
+    for g in context["vitA100"]:
+        if g != "TOTAL":
+            vit_headers.extend([f"{g} M", f"{g} F"])
+    vit_headers.extend(["Total M", "Total F"])
+
+    def vit_row(label, data):
+        row = [label]
+        for g, c in data.items():
+            if g != "TOTAL":
+                row.extend([c["M"], c["F"]])
+        row.extend([data["TOTAL"]["M"], data["TOTAL"]["F"]])
+        return row
+
+    add_simple_table(
+        doc,
+        vit_headers,
+        [
+            vit_row("Vitamine A – 1ère dose", context["vitA100"]),
+            vit_row("Vitamine A – 2ème dose", context["vitA200"]),
+            vit_row("Déparasitant", context["deparasitant"]),
+        ]
+    )
+
+    # =====================================================
+    # 7. DISTRIBUTION DE LAIT EN POUDRE (AVEC NOUVEAUX ENFANTS)
+    # =====================================================
+    doc.add_heading(
+        "Distribution de lait en poudre aux enfants pour éviter la transmission du VIH",
+        level=2
+    )
+
+    headers_lait = ["Indicateur"]
+    for g in context["lait"]:
+        if g != "TOTAL":
+            headers_lait.extend([f"{g} M", f"{g} F"])
+    headers_lait.extend(["Total M", "Total F"])
+
+    def lait_row(label, data):
+        row = [label]
+        for g, c in data.items():
+            if g != "TOTAL":
+                row.extend([c["M"], c["F"]])
+        row.extend([data["TOTAL"]["M"], data["TOTAL"]["F"]])
+        return row
+
+    rows_lait = [
+        lait_row("Nombre d’enfant ayant bénéficié de lait", context["lait"]),
+        lait_row("Nombre de nouveau enfant ayant bénéficié de lait", context["lait_nouveaux"]),
+    ]
+
+    add_simple_table(doc, headers_lait, rows_lait)
+
+    # =====================================================
+    # EXPORT
+    # =====================================================
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+
     response = HttpResponse(
-        bio.read(),
+        buffer.read(),
         content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
-    response["Content-Disposition"] = f'attachment; filename="rapport_{context["date_debut"]}_{context["date_fin"]}.docx"'
+    response["Content-Disposition"] = (
+        f'attachment; filename="rapport_{context["date_debut"]}_{context["date_fin"]}.docx"'
+    )
+
+    return response
+
+
+
+#Génération Excel
+def export_rapport_excel(context):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Rapport Mensuel"
+
+    bold = Font(bold=True)
+    center = Alignment(horizontal="center", vertical="center")
+
+    def write_row(values, bold_row=False, merge_to=None):
+        ws.append(values)
+        row_idx = ws.max_row
+
+        if merge_to:
+            ws.merge_cells(
+                start_row=row_idx,
+                start_column=1,
+                end_row=row_idx,
+                end_column=merge_to
+            )
+
+        if bold_row:
+            for cell in ws[row_idx]:
+                cell.font = bold
+                cell.alignment = center
+
+
+    # ================= TITRE =================
+    write_row(["Rapport Mensuel – Vaccination & Nutrition"], bold_row=True)
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=15)
+
+    ws.append([])
+
+    # ================= ÉVALUATION NUTRITIONNELLE + VACCINATION DE ROUTINE (tableau unique) =================
+    write_row(["ÉVALUATION NUTRITIONNELLE"], bold_row=True, merge_to=13)
+
+    write_row([
+        "SEXE",
+        "0-5 M", "0-5 F",
+        "6-11 M", "6-11 F",
+        "12-23 M", "12-23 F",
+        "24-59 M", "24-59 F",
+        "Sous-total M", "Sous-total F",
+        "Total", "Total référé"
+    ], bold_row=True)
+
+    def write_indicator(label, data, total):
+        row = [label]
+        for _, c in data.items():
+            row.extend([c["M"], c["F"]])
+        row.extend([total["M"], total["F"], total["TOTAL"], ""])
+        write_row(row)
+
+    write_indicator("Nombre d’enfants pesés", context["peses"], context["total_peses"])
+    write_indicator("Nombre d’enfants venus pour la première fois à une séance de vaccination", context["premieres_visites"], context["total_premieres_visites"])
+    write_indicator("Nombre d’enfants en surpoids", context["surpoids"], context["total_surpoids"])
+    write_indicator("Nombre d’enfants obèses (Obésité)", context["obeses"], context["total_obeses"])
+    write_indicator("Malnutrition aiguë modérée (MAM)", context["mam"], context["total_mam"])
+    write_indicator("Malnutrition aiguë sévère sans complication", context["mas"], context["total_mas"])
+
+    write_row(["Vaccination de routine"], bold_row=True, merge_to=13)
+
+    write_indicator("Nombre d’enfants vus en séance de vaccination PEV de routine", context["pev_routine"], context["total_pev_routine"])
+    write_indicator("Nombre d’enfants ayant reçu une MILDA en PEV", context["milda"], context["total_milda"])
+    write_indicator("Nombre d’enfants dépistés au PEV", context["depistes"], context["total_depistes"])
+    write_indicator("Nombre d’enfants dépistés et déclarés positifs au PEV", context["positifs"], context["total_positifs"])
+
+    write_row(
+        ["Total des mères venues pour la première fois aux activités (Ne pas compter la même personne deux fois)"],
+        bold_row=True, merge_to=13
+    )
+
+    ws.append([])
+
+    # ================= DÉTAILS DES VACCINS =================
+    write_row(["DÉTAIL DES VACCINS"], bold_row=True)
+    write_row(["Antigène", "Nombre vaccinés"], bold_row=True)
+
+    for ag, n in context["antigen_counts"].items():
+        write_row([ag, n])
+
+    ws.append([])
+
+    # ================= PRODUITS NUTRITIONNELS =================
+    write_row(["PRODUITS NUTRITIONNELS DISTRIBUÉS"], bold_row=True)
+    write_row(["Produit", "Quantité"], bold_row=True)
+
+    for p, n in context["produit_counts"].items():
+        write_row([p, n])
+        
+    # ================= PRISE EN CHARGE DE LA MALNUTRITION AIGUË =================
+    ws.append([])
+    write_row(["PRISE EN CHARGE DE LA MALNUTRITION AIGUË"], bold_row=True, merge_to=21)
+
+    write_row([
+        "Indicateurs",
+        "0-5 M","0-5 F",
+        "6-11 M","6-11 F",
+        "12-23 M","12-23 F",
+        "24-59 M","24-59 F",
+        "5-9 M","5-9 F",
+        "10-14 M","10-14 F",
+        "15-19 M","15-19 F",
+        "20-24 M","20-24 F",
+        "25+ M","25+ F",
+        "Sous-total M","Sous-total F"
+    ], bold_row=True)
+
+
+    def write_large_indicator(label, data, total):
+        row = [label]
+        for k in data.keys():
+            if k != "TOTAL":
+                row.extend([data[k]["M"], data[k]["F"]])
+        row.extend([total["M"], total["F"]])
+        write_row(row)
+
+
+    write_large_indicator(
+        "Nombre de malnutris sans complication pris en charge",
+        context["mas_pris"],
+        context["tot_mas_pris"]
+    )
+
+    write_large_indicator(
+        "Nombre de malnutris modéré pris en charge",
+        context["mam_pris"],
+        context["tot_mam_pris"]
+    )
+
+    write_large_indicator(
+        "Nombre de malnutris sans complication déclarés guéris",
+        context["mas_gueris"],
+        context["tot_mas_gueris"]
+    )
+
+    write_large_indicator(
+        "Nombre de malnutris modéré déclarés guéris",
+        context["mam_gueris"],
+        context["tot_mam_gueris"]
+    )
+
+    write_large_indicator(
+        "Abandon",
+        context["abandon"],
+        context["tot_abandon"]
+    )
+
+    write_large_indicator(
+        "Décès",
+        context["deces"],
+        context["tot_deces"]
+    )
+
+    # ================= VITAMINE A ET DÉPARASITANT =================
+    ws.append([])
+    write_row(["VITAMINE A ET DÉPARASITANT"], bold_row=True)
+
+    write_row([
+        "Indicateurs",
+        "6-11 M", "6-11 F",
+        "12-59 M", "12-59 F",
+        "60+ M", "60+ F",
+        "Total M", "Total F",
+    ], bold_row=True)
+
+    def write_vit(label, data):
+        row = [label]
+        for k, c in data.items():
+            if k != "TOTAL":
+                row.extend([c["M"], c["F"]])
+        row.extend([data["TOTAL"]["M"], data["TOTAL"]["F"]])
+        write_row(row)
+
+    write_vit("Vitamine A – 1ère dose", context["vitA100"])
+    write_vit("Vitamine A – 2ème dose", context["vitA200"])
+    write_vit("Déparasitant", context["deparasitant"])
+
+    # ================= ENFANTS AYANT REÇU DU LAIT =================
+    ws.append([])
+    write_row(
+        ["DISTRIBUTION DE LAIT EN POUDRE (Prévention VIH)"],
+        bold_row=True,
+        merge_to=11
+    )
+
+    write_row([
+        "Indicateurs",
+        "0-5 M","0-5 F",
+        "6-11 M","6-11 F",
+        "12-23 M","12-23 F",
+        "24-59 M","24-59 F",
+        "Total M","Total F"
+    ], bold_row=True)
+
+
+    def write_lait(label, data):
+        row = [label]
+        for k in data.keys():
+            if k != "TOTAL":
+                row.extend([data[k]["M"], data[k]["F"]])
+        row.extend([data["TOTAL"]["M"], data["TOTAL"]["F"]])
+        write_row(row)
+
+
+    write_lait("Nombre d'enfant ayant bénéficié de lait", context["lait"])
+    write_lait("Nombre de nouveau enfant ayant bénéficié de lait", context["lait_nouveaux"])
+
+
+    # ================= EXPORT =================
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="rapport_mensuel.xlsx"'
+    wb.save(response)
     return response
 
 
@@ -983,7 +1407,11 @@ def _report_to_pdf(request, context):
     response["Content-Disposition"] = f'attachment; filename="rapport_{context["date_debut"]}_{context["date_fin"]}.pdf"'
     return response
 
+###############################################################"
+# " historique patient
+################################################################
 def historique_patient(request, patient_id):
+    
     patient = get_object_or_404(Patient, id=patient_id)
 
     # Calcul âge lisible (années + mois)
@@ -1124,3 +1552,265 @@ def dashboard(request):
     }
 
     return render(request, "patient/dashboard.html", context)
+
+###############################################################"
+# " formatage des produits dans la liste des rdv
+################################################################
+
+def format_produits(rdv):
+    if not rdv:
+        return "-"
+
+    produits = rdv.produits_list
+
+    # Si c’est une fonction
+    if callable(produits):
+        produits = produits()
+
+    # Si c’est un QuerySet
+    if hasattr(produits, "values_list"):
+        produits = produits.values_list("nom", flat=True)
+
+    # Si c’est une liste ou un tuple
+    if isinstance(produits, (list, tuple)):
+        return ", ".join(str(p) for p in produits)
+
+    # Sinon (string ou autre)
+    return str(produits)
+
+
+###############################################################"
+# " exportation excel des patients
+################################################################
+
+def exporter_patients_excel(request):
+
+    date_debut_str = request.GET.get("datedebut")
+    date_fin_str = request.GET.get("datefin")
+
+    today = date.today()
+
+    try:
+        date_debut = datetime.strptime(date_debut_str, "%Y-%m-%d").date() if date_debut_str else today
+        date_fin = datetime.strptime(date_fin_str, "%Y-%m-%d").date() if date_fin_str else today
+    except ValueError:
+        date_debut = date_fin = today
+
+    # === MÊME LOGIQUE QUE liste_rdv ===
+    constantes = Constante.objects.filter(date__range=[date_debut, date_fin])
+    patients_ids = constantes.values_list("patient_id", flat=True).distinct()
+    patients = Patient.objects.filter(id__in=patients_ids)
+
+    nutritions = Nutrition.objects.filter(
+        patient_id__in=patients_ids,
+        date_visite__range=[date_debut, date_fin]
+    )
+    vaccinations = Vaccination.objects.filter(
+        patient_id__in=patients_ids,
+        date__range=[date_debut, date_fin]
+    )
+    rdvs = Rdv.objects.filter(
+        patient_id__in=patients_ids,
+        date_enregistrement__date__range=[date_debut, date_fin]
+    )
+
+    # === CRÉATION EXCEL ===
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "RDV"
+
+    ws.append([
+        "Nom", "Prénom", "Sexe", "Âge (mois)", "Téléphone", "Quartier",
+        "Date constante", "Poids", "Taille", "PB", "Z-score", "IMC", "Indice corporel",
+        "Code nutrition", "Date visite", "État nutritionnel",
+        "Date admission", "Date sortie", "Motif sortie",
+        "Date RDV", "Dépisté", "Code dépistage", "Résultat", "Produits",
+        "Vaccin", "Date vaccination",
+    ])
+
+    # === MÊME BOUCLE QUE LA PAGE ===
+    for patient in patients:
+        constante = constantes.filter(patient=patient).last()
+        nutrition = nutritions.filter(patient=patient).last()
+        vaccination = vaccinations.filter(patient=patient).last()
+        rdv = rdvs.filter(patient=patient).last()
+
+        ws.append([
+            patient.nom,
+            patient.prenom,
+            patient.sexe,
+            patient.age if patient.date_naissance else "",
+            patient.telephone or "",
+            patient.quartier or "",
+
+            constante.date.strftime("%d/%m/%Y") if constante else "",
+            constante.poids if constante else "",
+            constante.taille if constante else "",
+            constante.perimetre_brachial if constante else "",
+            constante.zscore if constante else "",
+            constante.imc if constante else "",
+            constante.indicecorporel if constante else "",
+
+            nutrition.code_nutrition if nutrition else "",
+            nutrition.date_visite.strftime("%d/%m/%Y") if nutrition else "",
+            nutrition.etat_nutrition if nutrition else "",
+            nutrition.date_admission.strftime("%d/%m/%Y") if nutrition and nutrition.date_admission else "",
+            nutrition.date_sortie.strftime("%d/%m/%Y") if nutrition and nutrition.date_sortie else "",
+            nutrition.motif_sortie if nutrition else "",
+
+            rdv.date_enregistrement.strftime("%d/%m/%Y") if rdv else "",
+            "Oui" if rdv and rdv.depiste else "Non",
+            rdv.code_depistage if rdv else "",
+            rdv.resultat if rdv else "",
+            format_produits(rdv),
+
+            #", ".join(rdv.produits_list()) if rdv and rdv.produits_list() else "",
+
+            vaccination.vaccin if vaccination else "",
+            vaccination.date.strftime("%d/%m/%Y") if vaccination else "",
+        ])
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = (
+        f"attachment; filename=rdv_{date_debut}_{date_fin}.xlsx"
+    )
+
+    wb.save(response)
+    return response
+
+
+def _dump_sqlite(db_path, now_str, zf):
+    if db_path.exists():
+        zf.write(str(db_path), arcname=f'backup_{now_str}/database/db.sqlite3')
+    from django.db import connection
+    lines = []
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY rootpage")
+        for row in cursor.fetchall():
+            lines.append(row[0] + ';\n')
+    zf.writestr(f'backup_{now_str}/database/dump.sql', '\n'.join(lines))
+
+
+def _dump_postgresql(db_conf, now_str, zf):
+    import subprocess
+    import tempfile
+    host = db_conf.get('HOST', 'localhost')
+    port = str(db_conf.get('PORT', '5432'))
+    name = db_conf.get('NAME', '')
+    user = db_conf.get('USER', '')
+    password = db_conf.get('PASSWORD', '')
+    env = os.environ.copy()
+    if password:
+        env['PGPASSWORD'] = password
+    with tempfile.NamedTemporaryFile(suffix='.sql', delete=False) as tmp:
+        tmp_path = tmp.name
+    try:
+        subprocess.run(
+            ['pg_dump', '-h', host, '-p', port, '-U', user, name, '-f', tmp_path],
+            env=env, check=True
+        )
+        zf.write(tmp_path, arcname=f'backup_{now_str}/database/{name}_dump.sql')
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
+@login_required
+def backup_db(request):
+    """
+    Sauvegarde universelle : fonctionne avec SQLite ET PostgreSQL.
+    - SQLite  → copie du fichier .sqlite3 + dump SQL texte
+    - PostgreSQL → dump via pg_dump (nécessite pg_dump installé sur le serveur)
+    """
+    now_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    zip_filename = f"NutriVa_backup_{now_str}.zip"
+
+    buf = io.BytesIO()
+    base_dir = settings.BASE_DIR
+    db_conf  = settings.DATABASES.get('default', {})
+    engine   = db_conf.get('ENGINE', '')
+
+    INCLUDE_DIRS    = ['NutriVa', 'patient', 'templates', 'static', 'media']
+    INCLUDE_FILES   = ['manage.py', 'requirements.txt', 'CLAUDE.md']
+    EXCLUDE_IN_PATH = ('__pycache__', '.git')
+    EXCLUDE_EXTS    = ('.pyc', '.pyo')
+
+    def should_exclude(path_str):
+        p = str(path_str)
+        return (any(e in p for e in EXCLUDE_IN_PATH) or
+                any(p.endswith(ext) for ext in EXCLUDE_EXTS))
+
+    db_error = None
+
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+
+        # ── 1. Sauvegarde de la base de données ──────────────────────────────
+        try:
+            if 'sqlite3' in engine:
+                db_path = settings.BASE_DIR / 'db.sqlite3'
+                _dump_sqlite(db_path, now_str, zf)
+            elif 'postgresql' in engine or 'postgis' in engine:
+                _dump_postgresql(db_conf, now_str, zf)
+            else:
+                zf.writestr(
+                    f'backup_{now_str}/database/README.txt',
+                    f"Moteur de base de données non supporté automatiquement : {engine}\n"
+                    "Veuillez effectuer la sauvegarde manuellement."
+                )
+        except Exception as exc:
+            db_error = str(exc)
+            zf.writestr(
+                f'backup_{now_str}/database/ERREUR.txt',
+                f"Erreur lors de la sauvegarde de la base :\n{db_error}"
+            )
+
+        # ── 2. Fichiers racine ────────────────────────────────────────────────
+        for fname in INCLUDE_FILES:
+            fpath = base_dir / fname
+            if fpath.exists():
+                zf.write(fpath, arcname=f'backup_{now_str}/{fname}')
+
+        # ── 3. Dossiers applicatifs ───────────────────────────────────────────
+        for dirname in INCLUDE_DIRS:
+            dir_path = base_dir / dirname
+            if not dir_path.exists():
+                continue
+            for root, dirs, files in os.walk(dir_path):
+                dirs[:] = [d for d in dirs if d not in EXCLUDE_IN_PATH]
+                for file in files:
+                    full_path = os.path.join(root, file)
+                    if should_exclude(full_path):
+                        continue
+                    rel_path = os.path.relpath(full_path, base_dir)
+                    zf.write(full_path, arcname=f'backup_{now_str}/{rel_path}')
+
+        # ── 4. Fiche de synthèse ──────────────────────────────────────────────
+        info_lines = [
+            "NutriVa — Sauvegarde système",
+            f"Date       : {datetime.now().strftime('%d/%m/%Y à %H:%M:%S')}",
+            f"Moteur DB  : {engine}",
+            f"Statut DB  : {'OK' if not db_error else 'ERREUR : ' + db_error}",
+            "",
+            "Contenu du backup :",
+            f"  backup_{now_str}/database/  → dump de la base de données",
+            f"  backup_{now_str}/NutriVa/   → configuration Django (settings, urls)",
+            f"  backup_{now_str}/patient/   → application patient (models, views, templates)",
+            f"  backup_{now_str}/templates/ → templates HTML globaux",
+            f"  backup_{now_str}/static/    → fichiers CSS/JS",
+            f"  backup_{now_str}/manage.py  → script Django",
+            "",
+            "Restauration SQLite  : copier db.sqlite3 à la racine du projet (NutriVa/)",
+            "Restauration Postgres: psql -U <user> -d <dbname> < database/<name>_dump.sql",
+        ]
+        zf.writestr(f'backup_{now_str}/BACKUP_INFO.txt', '\n'.join(info_lines))
+
+    buf.seek(0)
+
+    if db_error:
+        messages.warning(request, f"Backup généré avec une erreur DB : {db_error}")
+
+    response = HttpResponse(buf.read(), content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
+    return response

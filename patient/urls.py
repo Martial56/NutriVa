@@ -17,6 +17,8 @@ urlpatterns = [
     path('rechercher_patients/', views.rechercher_patients, name="rechercher_patients"),
     path("rapport/", views.rapports, name="rapport"),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("export-excel/", views.exporter_patients_excel, name="export_excel"),
+
     
    # path('login/', auth_views.LoginView.as_view(template_name='patient/login.html'), name='login'),
 
@@ -27,6 +29,7 @@ urlpatterns = [
     path('enregistrement_nutrition/<int:patient_id>/', views.enregistrement_nutrition, name='enregistrement_nutrition'),
     path('enregistrer_apport_nutrition/<int:patient_id>/', views.enregistrer_apport_nutrition, name='enregistrer_apport_nutrition'),
     path('historique_patient/<int:patient_id>/', views.historique_patient, name="historique_patient"),
+    path('backup/', views.backup_db, name="backup"),
 
-    
+
 ]
