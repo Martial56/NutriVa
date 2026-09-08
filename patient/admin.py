@@ -84,7 +84,6 @@ class RdvAdmin(admin.ModelAdmin):
 
     list_filter = ("depiste", "resultat", "date_enregistrement")
     search_fields = ("patient__nom", "patient__prenom", "code_depistage")
-    readonly_fields = ("date_enregistrement",)
 
     def produits_list(self, obj):
         return obj.produits_list()

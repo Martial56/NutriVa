@@ -35,6 +35,25 @@ try:
 except:
     weasyprint = None
 
+# Libellé et classe CSS (sévérité) pour chaque valeur du champ Nutrition.etat_nutrition
+NUTRITION_ETAT_LABELS = {
+    "normal": ("Normal", "etat-normal"),
+    "modere": ("Modéré", "etat-modere"),
+    "severe_sans_comp": ("Sévère", "etat-severe"),
+    "severe_avec_comp": ("Sévère+", "etat-severe"),
+    "surpoids": ("Surpoids", "etat-surpoids"),
+    "obesite": ("Obésité", "etat-surpoids"),
+}
+
+
+def _attacher_derniere_nutrition(patient):
+    nutrition = Nutrition.objects.filter(patient=patient).order_by("-date_visite").first()
+    if nutrition:
+        label, css_class = NUTRITION_ETAT_LABELS.get(nutrition.etat_nutrition, (nutrition.etat_nutrition, "etat-normal"))
+        nutrition.etat_label = label
+        nutrition.etat_class = css_class
+    patient.derniere_nutrition = nutrition
+
 
 #la vue pour la page d'accueil
 @login_required
@@ -48,6 +67,11 @@ def login(request):
 #la vue pour la page de creation de patient
 def creer_patient(request):
     return render(request, 'patient/creer_patient.html')
+
+#la vue pour la page de modification des informations générales du patient
+def modifier_patient(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+    return render(request, 'patient/modifier_patient.html', {"patient": patient})
 
 #la vue pour la page de saisie des constantes
 def constante(request, patient_id):
@@ -123,6 +147,9 @@ def nutrition(request, patient_id):
 #la vue pour la page de liste des patients
 def liste_patients(request):
     patients = Patient.objects.all()
+    for patient in patients:
+        patient.derniere_constante = Constante.objects.filter(patient=patient).order_by("-date").first()
+        _attacher_derniere_nutrition(patient)
     return render(request, "patient/liste_patients.html", {"patients": patients})
 
 # bouton rechercher dans la liste des patients
@@ -143,6 +170,10 @@ def rechercher_patients(request):
 
     aucun_resultat = (not patients.exists())
 
+    for patient in patients:
+        patient.derniere_constante = Constante.objects.filter(patient=patient).order_by("-date").first()
+        _attacher_derniere_nutrition(patient)
+
     return render(request, "patient/liste_patients.html", {
         "patients": patients,
         "query": query,
@@ -162,7 +193,21 @@ def enregistrement_patient(request):
         quartier = request.POST.get('quartier')
         telephone = request.POST.get('phone')
         statut = request.POST.get('statut')
-        
+
+        doublon = Patient.objects.filter(
+            nom__iexact=nom,
+            prenom__iexact=prenom,
+            sexe=sexe,
+            date_naissance=date_naissance,
+            telephone=telephone,
+        ).exists()
+
+        if doublon:
+            return render(request, 'patient/creer_patient.html', {
+                'erreur_doublon': "Un patient avec ce nom, ce prénom, ce sexe, cette date de naissance et ce téléphone existe déjà.",
+                'form_data': request.POST,
+            })
+
         date_creation = date.today()
         patient = Patient(
            # code="PT" + str(Patient.objects.count() + 1).zfill(4),
@@ -179,6 +224,22 @@ def enregistrement_patient(request):
         patient.save()
         return redirect('liste_patients')  # Rediriger vers la liste des patients après l'enregistrement
     return render(request, 'patient/creer_patient.html')
+
+#Bouton enregistrer de la page de modification des informations générales du patient
+def enregistrement_modification_patient(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+    if request.method == 'POST':
+        patient.nom = request.POST.get('nom')
+        patient.prenom = request.POST.get('prenom')
+        patient.date_naissance = request.POST.get('date_naissance')
+        patient.sexe = request.POST.get('sexe')
+        patient.nom_parent = request.POST.get('nom_parent')
+        patient.quartier = request.POST.get('quartier')
+        patient.telephone = request.POST.get('phone')
+        patient.statut = request.POST.get('statut')
+        patient.save()
+        return redirect('historique_patient', patient_id=patient.id)
+    return render(request, 'patient/modifier_patient.html', {"patient": patient})
 
 #Bouton enregistrer de la page saisie des constantes
 def enregistrement_constante(request, patient_id):
@@ -223,17 +284,20 @@ def liste_rdv(request):
     except ValueError:
         date_debut, date_fin = today, today
 
-    # 🔹 Filtrer uniquement les constantes entre les deux dates
+    # 🔹 Récupérer chaque type de prestation réalisée dans la période
     constantes = Constante.objects.filter(date__range=[date_debut, date_fin])
+    nutritions = Nutrition.objects.filter(date_visite__range=[date_debut, date_fin])
+    vaccinations = Vaccination.objects.filter(date__range=[date_debut, date_fin])
+    rdvs = Rdv.objects.filter(date_enregistrement__date__range=[date_debut, date_fin])
 
-    # 🔹 Extraire uniquement les patients liés à ces constantes
-    patients_ids = constantes.values_list('patient_id', flat=True).distinct()
+    # 🔹 Un patient apparaît dès qu'il a bénéficié d'au moins une prestation
+    # (constante, nutrition, vaccination/VAT ou rdv) sur la période, et non
+    # uniquement s'il a une constante ce jour-là.
+    patients_ids = set(constantes.values_list('patient_id', flat=True))
+    patients_ids.update(nutritions.values_list('patient_id', flat=True))
+    patients_ids.update(vaccinations.values_list('patient_id', flat=True))
+    patients_ids.update(rdvs.values_list('patient_id', flat=True))
     patients = Patient.objects.filter(id__in=patients_ids)
-
-    # 🔹 Récupérer les nutritions et vaccinations liées à ces patients
-    nutritions = Nutrition.objects.filter(patient_id__in=patients_ids, date_visite__range=[date_debut, date_fin])
-    vaccinations = Vaccination.objects.filter(patient_id__in=patients_ids, date__range=[date_debut, date_fin])
-    rdvs = Rdv.objects.filter(patient_id__in=patients_ids,  date_enregistrement__date__range=[date_debut, date_fin])
 
     # 🔹 Construire la structure de données à afficher
     data = []
@@ -243,8 +307,16 @@ def liste_rdv(request):
         vaccination = vaccinations.filter(patient=patient).last()
         rdv = rdvs.filter(patient=patient).last()
 
+        date_prestation = (
+            (constante.date if constante else None)
+            or (vaccination.date if vaccination else None)
+            or (nutrition.date_visite if nutrition else None)
+            or (rdv.date_enregistrement.date() if rdv else None)
+        )
+
         data.append({
             'patient': patient,
+            'date': date_prestation,
             'constante': constante,
             'nutrition': nutrition,
             'vaccination': vaccination,
@@ -1598,21 +1670,17 @@ def exporter_patients_excel(request):
 
     # === MÊME LOGIQUE QUE liste_rdv ===
     constantes = Constante.objects.filter(date__range=[date_debut, date_fin])
-    patients_ids = constantes.values_list("patient_id", flat=True).distinct()
-    patients = Patient.objects.filter(id__in=patients_ids)
+    nutritions = Nutrition.objects.filter(date_visite__range=[date_debut, date_fin])
+    vaccinations = Vaccination.objects.filter(date__range=[date_debut, date_fin])
+    rdvs = Rdv.objects.filter(date_enregistrement__date__range=[date_debut, date_fin])
 
-    nutritions = Nutrition.objects.filter(
-        patient_id__in=patients_ids,
-        date_visite__range=[date_debut, date_fin]
-    )
-    vaccinations = Vaccination.objects.filter(
-        patient_id__in=patients_ids,
-        date__range=[date_debut, date_fin]
-    )
-    rdvs = Rdv.objects.filter(
-        patient_id__in=patients_ids,
-        date_enregistrement__date__range=[date_debut, date_fin]
-    )
+    # Un patient apparaît dès qu'il a bénéficié d'au moins une prestation
+    # (constante, nutrition, vaccination/VAT ou rdv) sur la période.
+    patients_ids = set(constantes.values_list("patient_id", flat=True))
+    patients_ids.update(nutritions.values_list("patient_id", flat=True))
+    patients_ids.update(vaccinations.values_list("patient_id", flat=True))
+    patients_ids.update(rdvs.values_list("patient_id", flat=True))
+    patients = Patient.objects.filter(id__in=patients_ids)
 
     # === CRÉATION EXCEL ===
     wb = Workbook()

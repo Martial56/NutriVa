@@ -50,7 +50,7 @@
             <tbody>
                 {% for d in data %}
                 <tr>
-                    <td>{{ d.constante.date|date:"d/m/Y"|default:"-" }}</td>
+                    <td>{{ d.date|date:"d/m/Y"|default:"-" }}</td>
                     <td>{{ d.patient.nom }} {{ d.patient.prenom }}</td>
                     <td>{{ d.nutrition.etat_nutrition|default:"-" }}</td>
                     <td>

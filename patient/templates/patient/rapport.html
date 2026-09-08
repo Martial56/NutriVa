@@ -42,24 +42,26 @@
         <h1>Rapport Mensuel - Vaccination & Nutrition</h1>
     </div>
 
-  <!-- Sélection de période -->
-  <form method="get" class="row g-3 mb-4" style="margin-left: 20px;">
-    <div class="col-md-3">
-      <label for="date_debut" class="form-label">Date début</label>
-      <input type="date" id="date_debut" name="date_debut" value="{{ date_debut|date:'Y-m-d' }}" class="form-control" required>
-    </div>
-    <div class="col-md-3">
-      <label for="date_fin" class="form-label">Date fin</label>
-      <input type="date" id="date_fin" name="date_fin" value="{{ date_fin|date:'Y-m-d' }}" class="form-control" required>
-    </div>
-    <div class="col-md-3 align-self-end">
-      <button type="submit" class="btn btn-primary w-100">Afficher le rapport</button>
-    </div>
-  </form>
-
 <div class="container">
 
-  
+  <!-- Sélection de période -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-3">
+          <label for="date_debut" class="form-label">Date début</label>
+          <input type="date" id="date_debut" name="date_debut" value="{{ date_debut|date:'Y-m-d' }}" class="form-control" required>
+        </div>
+        <div class="col-md-3">
+          <label for="date_fin" class="form-label">Date fin</label>
+          <input type="date" id="date_fin" name="date_fin" value="{{ date_fin|date:'Y-m-d' }}" class="form-control" required>
+        </div>
+        <div class="col-md-3 align-self-end">
+          <button type="submit" class="btn btn-primary w-100">Afficher le rapport</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   {% if peses %}
   <!-- Boutons de téléchargement -->

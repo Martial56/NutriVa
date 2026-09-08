@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('index', views.index, name="index"),
     path('ajouter/', views.creer_patient, name="creer_patient"),
+    path('modifier_patient/<int:patient_id>/', views.modifier_patient, name="modifier_patient"),
     path('liste/', views.liste_patients, name="liste_patients"),
     path('constante/<int:patient_id>/', views.constante, name="constante"),
     path('vaccination/<int:patient_id>/', views.vaccination, name="vaccination"),
@@ -24,6 +25,7 @@ urlpatterns = [
 
  
     path("enregistrement_patient/", views.enregistrement_patient, name="enregistrement_patient"),
+    path('enregistrement_modification_patient/<int:patient_id>/', views.enregistrement_modification_patient, name="enregistrement_modification_patient"),
     path('enregistrement_constante/<int:patient_id>/', views.enregistrement_constante, name='enregistrement_constante'),
     path('enregistrement_vaccin/<int:patient_id>/', views.enregistrement_vaccin, name='enregistrement_vaccin'),
     path('enregistrement_nutrition/<int:patient_id>/', views.enregistrement_nutrition, name='enregistrement_nutrition'),

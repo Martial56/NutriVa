@@ -20,19 +20,19 @@
     <div class="row">
         <div class="col-md-4">
             <select name="month" class="form-select" onchange="this.form.submit()">
-                <option value="">— Choisir un mois —</option>
-                <option value="1">Janvier</option>
-                <option value="2">Février</option>
-                <option value="3">Mars</option>
-                <option value="4">Avril</option>
-                <option value="5">Mai</option>
-                <option value="6">Juin</option>
-                <option value="7">Juillet</option>
-                <option value="8">Août</option>
-                <option value="9">Septembre</option>
-                <option value="10">Octobre</option>
-                <option value="11">Novembre</option>
-                <option value="12">Décembre</option>
+                <option value="" {% if not selected_month %}selected{% endif %}>— Tous —</option>
+                <option value="1" {% if selected_month == "1" %}selected{% endif %}>Janvier</option>
+                <option value="2" {% if selected_month == "2" %}selected{% endif %}>Février</option>
+                <option value="3" {% if selected_month == "3" %}selected{% endif %}>Mars</option>
+                <option value="4" {% if selected_month == "4" %}selected{% endif %}>Avril</option>
+                <option value="5" {% if selected_month == "5" %}selected{% endif %}>Mai</option>
+                <option value="6" {% if selected_month == "6" %}selected{% endif %}>Juin</option>
+                <option value="7" {% if selected_month == "7" %}selected{% endif %}>Juillet</option>
+                <option value="8" {% if selected_month == "8" %}selected{% endif %}>Août</option>
+                <option value="9" {% if selected_month == "9" %}selected{% endif %}>Septembre</option>
+                <option value="10" {% if selected_month == "10" %}selected{% endif %}>Octobre</option>
+                <option value="11" {% if selected_month == "11" %}selected{% endif %}>Novembre</option>
+                <option value="12" {% if selected_month == "12" %}selected{% endif %}>Décembre</option>
             </select>
         </div>
     </div>

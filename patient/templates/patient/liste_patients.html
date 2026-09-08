@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 {% load static %}
+{% load patient_extras %}
 <head>
     <meta charset="UTF-8">
     <title>Patients – Vue Kanban</title>
@@ -33,30 +34,39 @@
 
     <!-- Grid Kanban -->
     <div class="container-fluid px-3 pt-3">
-        <div class="row g-2">
+        <div class="patient-kanban-grid">
             {% for patient in patients %}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="patient-col">
                     <a href="{% url 'historique_patient' patient.id %}" class="text-decoration-none text-dark d-block">
-                        <div class="patient-card kanban text-center">
-                            <img src="{% static 'images/person.png' %}" alt="Photo" class="rounded-circle" width="50" height="50">
-                            <div class="patient-name">{{ patient.nom }} {{ patient.prenom }}</div>
-                            <div class="patient-meta">
-                                <span>{{ patient.age }} mois</span> &middot;
-                                <span>{{ patient.sexe }}</span>
+                        <div class="patient-row-card">
+                            <div class="patient-row-top">
+                                <div class="patient-row-left">
+                                    <div class="avatar-circle">
+                                        <img src="{% static 'images/person.png' %}" alt="Photo" width="24" height="24">
+                                    </div>
+                                    <div class="patient-row-info">
+                                        <div class="patient-row-name">{{ patient.nom }} {{ patient.prenom }}</div>
+                                        <div class="patient-row-meta">
+                                            <span>{{ patient.age|age_affichage }}</span> &middot;
+                                            <span>{{ patient.sexe }}</span>
+                                            {% if patient.quartier %} &middot; <span>{{ patient.quartier }}</span>{% endif %}
+                                        </div>
+                                        <div class="patient-row-phone">{{ patient.telephone|default:"—" }}</div>
+                                    </div>
+                                </div>
+
+                                {% if patient.derniere_nutrition.etat_label %}
+                                    <span class="badge-pill patient-row-etat {{ patient.derniere_nutrition.etat_class }}">{{ patient.derniere_nutrition.etat_label }}</span>
+                                {% endif %}
                             </div>
-                            <div class="patient-meta text-truncate" title="{{ patient.quartier }}">{{ patient.quartier }}</div>
-                            {% if patient.telephone %}
-                                <div class="patient-meta">{{ patient.telephone }}</div>
-                            {% endif %}
-                            <div>
+
+                            <hr class="patient-row-divider">
+
+                            <div class="patient-row-footer">
                                 {% if patient.statut == "FE_FA" %}
-                                    <a href="{% url 'vaccination' patient.id %}" onclick="event.stopPropagation()">
-                                        <button class="btn btn-success btn-action">VAT</button>
-                                    </a>
+                                    <a href="{% url 'vaccination' patient.id %}" class="pill-action pill-action-vat" onclick="event.stopPropagation()">VAT</a>
                                 {% else %}
-                                    <a href="{% url 'constante' patient.id %}" onclick="event.stopPropagation()">
-                                        <button class="btn btn-secondary btn-action">Constante</button>
-                                    </a>
+                                    <a href="{% url 'constante' patient.id %}" class="pill-action pill-action-constante" onclick="event.stopPropagation()">Constantes</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -64,9 +74,7 @@
                 </div>
 
             {% empty %}
-            <div class="col-12">
-                <p class="text-center text-muted mt-4">Aucun patient enregistré</p>
-            </div>
+                <p class="text-center text-muted mt-4 patient-kanban-empty">Aucun patient enregistré</p>
             {% endfor %}
         </div>
     </div>

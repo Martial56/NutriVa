@@ -17,37 +17,41 @@
         <form action="{% url 'enregistrement_patient' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="row">
-                <!--<div class="alert alert-success"> </div>-->
-  
+                {% if erreur_doublon %}
+                <div class="col-12">
+                    <div class="alert alert-danger">{{ erreur_doublon }}</div>
+                </div>
+                {% endif %}
+
                 <div class="col-6">
                     <div class="card">
                         <div class="card-header bg-dark text-white">
                             informations patient
                         </div>
                         <div class="card-body">
-                            
+
                             <div class="mb-2">
-                                <input id="nom" name="nom" class="form-control form-control-sm" type="text" placeholder="Nom" aria-label=".form-control-sm example" required>
+                                <input id="nom" name="nom" class="form-control form-control-sm" type="text" placeholder="Nom" aria-label=".form-control-sm example" value="{{ form_data.nom|default:'' }}" required>
                             </div>
                             <div class="mb-2">
-                                <input id="prenom" name="prenom" class="form-control form-control-sm" type="text" placeholder="Prénoms" aria-label=".form-control-sm example" required>
+                                <input id="prenom" name="prenom" class="form-control form-control-sm" type="text" placeholder="Prénoms" aria-label=".form-control-sm example" value="{{ form_data.prenom|default:'' }}" required>
                             </div>
                             <div class="mb-2">
                                 <select id="sexe" name="sexe" class="form-select form-select-sm" aria-label=".form-select-sm example"required>
-                                    <option value=""selected>Sexe</option>
-                                    <option value="M">Homme</option>
-                                    <option value="F">Femme</option>
+                                    <option value="" {% if not form_data.sexe %}selected{% endif %}>Sexe</option>
+                                    <option value="M" {% if form_data.sexe == "M" %}selected{% endif %}>Homme</option>
+                                    <option value="F" {% if form_data.sexe == "F" %}selected{% endif %}>Femme</option>
                                 </select>
                             </div>
                             <div class="mb-2">
-                                <input id="date_naissance" name="date_naissance" class="form-control form-control-sm" type="date" placeholder="Date de naissance" aria-label=".form-control-sm example" required>
+                                <input id="date_naissance" name="date_naissance" class="form-control form-control-sm" type="date" placeholder="Date de naissance" aria-label=".form-control-sm example" value="{{ form_data.date_naissance|default:'' }}" required>
                             </div>
                             <div class="mb-2">
                                <!-- <input id="statut" name="statut" class="form-control form-control-sm" type="checkbox" value="1" aria-label=".form-control-sm example" required>Femme enceinte/Allaitante-->
                                 <select id="statut" name="statut" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                                    <option value="" selected>Statut</option>
-                                    <option value="Enfant">Enfant</option>
-                                    <option value="FE_FA">Femme enceinte/Allaitante</option>
+                                    <option value="" {% if not form_data.statut %}selected{% endif %}>Statut</option>
+                                    <option value="Enfant" {% if form_data.statut == "Enfant" %}selected{% endif %}>Enfant</option>
+                                    <option value="FE_FA" {% if form_data.statut == "FE_FA" %}selected{% endif %}>Femme enceinte/Allaitante</option>
                                 </select>
                             </div>
                         </div>
@@ -60,16 +64,16 @@
                         </div>
                         <div class="card-body">
                             <div class="mb-2">
-                                <input id="nom" name="nom_parent" class="form-control form-control-sm" type="text" placeholder="Nom et prénoms du parent" aria-label=".form-control-sm example" required>
+                                <input id="nom_parent" name="nom_parent" class="form-control form-control-sm" type="text" placeholder="Nom et prénoms du parent" aria-label=".form-control-sm example" value="{{ form_data.nom_parent|default:'' }}" required>
                             </div>
                             <div class="mb-2">
-                                <input id="quartier" name="quartier" class="form-control form-control-sm" type="text" placeholder="Quartier" aria-label=".form-control-sm example" required>
+                                <input id="quartier" name="quartier" class="form-control form-control-sm" type="text" placeholder="Quartier" aria-label=".form-control-sm example" value="{{ form_data.quartier|default:'' }}" required>
                             </div>
                             <div class="mb-2">
-                                <input class="form-control form-control-sm" id="phone" name="phone" type="phone" placeholder="Téléphone personnel" aria-label=".form-control-sm example" maxlength="10" required>
+                                <input class="form-control form-control-sm" id="phone" name="phone" type="phone" placeholder="Téléphone personnel" aria-label=".form-control-sm example" maxlength="10" value="{{ form_data.phone|default:'' }}" required>
                             </div>
                             <div class="justify-content-md-end">
-                                <a href="{% url 'liste_patients'%}"><button class="btn btn-primary" type="submit" id="inscrire" name="inscrire">Enregistrer</button></a>
+                                <button class="btn btn-primary" type="submit" id="inscrire" name="inscrire">Enregistrer</button>
                             </div>
                         </div>
                     </div>

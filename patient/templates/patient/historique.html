@@ -25,7 +25,12 @@
     </div>
 
     <div class="card m-3 p-3">
-        <h4>Informations générales du Patient</h4>
+        <div class="d-flex justify-content-between align-items-start">
+            <h4>Informations générales du Patient</h4>
+            <a href="{% url 'modifier_patient' patient.id %}" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-pen"></i> Modifier
+            </a>
+        </div>
         <p><strong>Nom :</strong> {{ patient.nom }}</p>
         <p><strong>Prénom :</strong> {{ patient.prenom }}</p>
         <p><strong>Âge :</strong> {{ age_affichage }}</p>

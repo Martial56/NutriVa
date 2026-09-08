@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier un patient</title>
+    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body >
+    {% include 'patient/header.html' %}
+     <header class="header-bar-vaccin">
+        <h1>Modifier les informations du patient</h1>
+    </header>
+
+    <div class="container-enregistrement">
+        <form action="{% url 'enregistrement_modification_patient' patient.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            informations patient
+                        </div>
+                        <div class="card-body">
+
+                            <div class="mb-2">
+                                <input id="nom" name="nom" class="form-control form-control-sm" type="text" placeholder="Nom" value="{{ patient.nom }}" required>
+                            </div>
+                            <div class="mb-2">
+                                <input id="prenom" name="prenom" class="form-control form-control-sm" type="text" placeholder="Prénoms" value="{{ patient.prenom }}" required>
+                            </div>
+                            <div class="mb-2">
+                                <select id="sexe" name="sexe" class="form-select form-select-sm" required>
+                                    <option value="" {% if not patient.sexe %}selected{% endif %}>Sexe</option>
+                                    <option value="M" {% if patient.sexe == "M" %}selected{% endif %}>Homme</option>
+                                    <option value="F" {% if patient.sexe == "F" %}selected{% endif %}>Femme</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <input id="date_naissance" name="date_naissance" class="form-control form-control-sm" type="date" value="{{ patient.date_naissance|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="mb-2">
+                                <select id="statut" name="statut" class="form-select form-select-sm" required>
+                                    <option value="" {% if not patient.statut %}selected{% endif %}>Statut</option>
+                                    <option value="Enfant" {% if patient.statut == "Enfant" %}selected{% endif %}>Enfant</option>
+                                    <option value="FE_FA" {% if patient.statut == "FE_FA" %}selected{% endif %}>Femme enceinte/Allaitante</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            informations complémentaires
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <input id="nom_parent" name="nom_parent" class="form-control form-control-sm" type="text" placeholder="Nom et prénoms du parent" value="{{ patient.nom_parent }}" required>
+                            </div>
+                            <div class="mb-2">
+                                <input id="quartier" name="quartier" class="form-control form-control-sm" type="text" placeholder="Quartier" value="{{ patient.quartier }}" required>
+                            </div>
+                            <div class="mb-2">
+                                <input class="form-control form-control-sm" id="phone" name="phone" type="text" placeholder="Téléphone personnel" value="{{ patient.telephone }}" maxlength="10" required>
+                            </div>
+                            <div class="justify-content-md-end">
+                                <button class="btn btn-primary" type="submit" id="modifier" name="modifier">Enregistrer</button>
+                                <a href="{% url 'historique_patient' patient.id %}"><button class="btn btn-secondary" type="button">Annuler</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
