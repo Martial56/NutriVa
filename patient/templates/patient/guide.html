@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="fr">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide d'utilisation</title>
+    <link rel="stylesheet" href="{% static 'patient/style.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+
+    <style>
+        .guide-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 32px;
+            max-width: 1200px;
+            margin: 24px auto 60px;
+            padding: 0 20px;
+        }
+        .guide-toc {
+            position: sticky;
+            top: 20px;
+            flex: 0 0 240px;
+            background: #fff;
+            border: 1px solid #e5e9f0;
+            border-radius: 10px;
+            padding: 18px;
+        }
+        .guide-toc h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #6c757d;
+            margin: 0 0 12px;
+        }
+        .guide-toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            counter-reset: toc;
+        }
+        .guide-toc li {
+            counter-increment: toc;
+            margin-bottom: 6px;
+        }
+        .guide-toc a {
+            display: block;
+            padding: 6px 8px;
+            border-radius: 6px;
+            color: #1a2a4a;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .guide-toc a:before {
+            content: counter(toc) ". ";
+            color: #3f7ac5;
+            font-weight: 600;
+        }
+        .guide-toc a:hover {
+            background: #eef4fd;
+        }
+        .guide-content {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .guide-intro {
+            background: #fff;
+            border: 1px solid #e5e9f0;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            color: #3a4356;
+            line-height: 1.55;
+        }
+        .guide-section {
+            background: #fff;
+            border: 1px solid #e5e9f0;
+            border-radius: 10px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            scroll-margin-top: 20px;
+        }
+        .guide-section h2 {
+            font-size: 21px;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .guide-section h2 i {
+            color: #3f7ac5;
+        }
+        .guide-section .lead {
+            color: #6c757d;
+            margin-bottom: 16px;
+        }
+        .guide-section ol, .guide-section ul {
+            padding-left: 20px;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+        .guide-section ol li, .guide-section ul li {
+            margin-bottom: 4px;
+        }
+        .guide-shot {
+            border: 1px solid #dde4f0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8f9fa;
+            display: block;
+        }
+        .guide-shot img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        figure.guide-figure {
+            margin: 0 0 18px;
+        }
+        figcaption {
+            font-size: 13px;
+            color: #8a94a6;
+            margin-top: 6px;
+            text-align: center;
+        }
+        .guide-tip {
+            background: #eef4fd;
+            border-left: 4px solid #3f7ac5;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1a2a4a;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 900px) {
+            .guide-wrap { flex-direction: column; }
+            .guide-toc { position: static; width: 100%; flex-basis: auto; }
+        }
+    </style>
+</head>
+<body class="bg-light">
+{% include 'patient/header.html' %}
+
+<div class="header-bar-vaccin">
+    <h1><i class="fa-solid fa-circle-question"></i> Guide d'utilisation de NutriVa</h1>
+</div>
+
+<div class="guide-wrap">
+    <nav class="guide-toc">
+        <h2>Sommaire</h2>
+        <ol>
+            <li><a href="#connexion">Connexion</a></li>
+            <li><a href="#accueil">Page d'accueil</a></li>
+            <li><a href="#dashboard">Tableau de bord</a></li>
+            <li><a href="#patients">Gestion des patients</a></li>
+            <li><a href="#rdv">Rendez-vous</a></li>
+            <li><a href="#constante">Constantes</a></li>
+            <li><a href="#vaccination">Vaccination</a></li>
+            <li><a href="#nutrition">Nutrition</a></li>
+            <li><a href="#historique">Historique du patient</a></li>
+            <li><a href="#rapports">Rapports</a></li>
+            <li><a href="#compte">Compte, sauvegarde & aide</a></li>
+        </ol>
+    </nav>
+
+    <div class="guide-content">
+        <div class="guide-intro">
+            <strong>NutriVa</strong> est l'outil de gestion des patients et de suivi nutritionnel utilisé par le
+            centre de santé. Ce guide présente, page par page, les principales fonctionnalités de l'application :
+            inscription des patients, prise des constantes, suivi vaccinal, prise en charge nutritionnelle,
+            rendez-vous et rapports mensuels. Chaque section montre une capture d'écran réelle de la page concernée
+            et les étapes à suivre pour l'utiliser.
+        </div>
+
+        <section id="connexion" class="guide-section">
+            <h2><i class="fa-solid fa-right-to-bracket"></i> Connexion</h2>
+            <p class="lead">L'accès à NutriVa nécessite un compte utilisateur créé par un administrateur.</p>
+            <ol>
+                <li>Ouvrez l'application dans votre navigateur.</li>
+                <li>Renseignez votre <strong>nom d'utilisateur</strong> et votre <strong>mot de passe</strong>.</li>
+                <li>Cliquez sur <strong>Se connecter</strong>.</li>
+            </ol>
+            <div class="guide-tip">
+                <i class="fa-solid fa-lightbulb"></i> Si vos identifiants sont incorrects, un message s'affiche
+                au-dessus du formulaire. Contactez un administrateur si le problème persiste.
+            </div>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/login.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/login.png' %}" alt="Page de connexion NutriVa">
+                </a>
+                <figcaption>Page de connexion</figcaption>
+            </figure>
+        </section>
+
+        <section id="accueil" class="guide-section">
+            <h2><i class="fa-solid fa-house"></i> Page d'accueil</h2>
+            <p class="lead">
+                Après connexion, vous arrivez sur la page d'accueil. Le menu principal en haut de l'écran permet de
+                naviguer entre toutes les sections de l'application : Accueil, Patients, Rendez-vous, Tableau de
+                Bord et Rapports.
+            </p>
+            <p>Cliquez sur <strong>Accéder aux patients</strong> pour ouvrir directement la liste des patients.</p>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/accueil.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/accueil.png' %}" alt="Page d'accueil NutriVa">
+                </a>
+                <figcaption>Page d'accueil et menu principal</figcaption>
+            </figure>
+        </section>
+
+        <section id="dashboard" class="guide-section">
+            <h2><i class="fa-solid fa-chart-pie"></i> Tableau de bord</h2>
+            <p class="lead">
+                Le tableau de bord donne une vue d'ensemble de l'activité du centre : nombre de patients inscrits,
+                nouveaux patients du mois, vaccins administrés, patients malnutris pris en charge, personnes
+                dépistées et cas positifs.
+            </p>
+            <ol>
+                <li>Utilisez le menu déroulant <strong>— Tous —</strong> en haut de la page pour filtrer les
+                    statistiques par mois.</li>
+                <li>Les graphiques affichent la répartition par sexe, l'état nutritionnel des patients, les
+                    produits distribués et l'évolution des visites mois par mois.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/dashboard.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/dashboard.png' %}" alt="Tableau de bord NutriVa">
+                </a>
+                <figcaption>Tableau de bord et statistiques</figcaption>
+            </figure>
+        </section>
+
+        <section id="patients" class="guide-section">
+            <h2><i class="fa-solid fa-users"></i> Gestion des patients</h2>
+            <p class="lead">
+                La page <strong>Patients</strong> liste tous les patients enregistrés sous forme de fiches, avec
+                leur âge, sexe, quartier et dernier état nutritionnel connu.
+            </p>
+            <ol>
+                <li>Utilisez la barre de recherche pour retrouver un patient par nom, prénom ou numéro de téléphone.</li>
+                <li>Cliquez sur <strong>Constantes</strong> ou <strong>VAT</strong> sur une fiche pour ouvrir
+                    directement la saisie correspondante.</li>
+                <li>Cliquez sur l'icône <i class="fa-solid fa-user-plus"></i> en haut à droite pour ouvrir le
+                    formulaire de création d'un nouveau patient.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/liste_patients.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/liste_patients.png' %}" alt="Liste des patients">
+                </a>
+                <figcaption>Liste et recherche des patients</figcaption>
+            </figure>
+
+            <p class="lead" style="margin-top:24px;">Le formulaire de création d'un patient se compose de deux
+                blocs : les informations d'identité et les informations complémentaires (parent, quartier,
+                téléphone).</p>
+            <ol>
+                <li>Renseignez le nom, les prénoms, le sexe, la date de naissance et le statut du patient
+                    (enfant, femme enceinte/allaitante...).</li>
+                <li>Complétez les informations du parent/tuteur, le quartier et le téléphone.</li>
+                <li>Cliquez sur <strong>Enregistrer</strong>.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/creer_patient.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/creer_patient.png' %}" alt="Formulaire de création de patient">
+                </a>
+                <figcaption>Formulaire de création d'un patient</figcaption>
+            </figure>
+        </section>
+
+        <section id="rdv" class="guide-section">
+            <h2><i class="fa-solid fa-calendar-days"></i> Rendez-vous</h2>
+            <p class="lead">
+                Cette page récapitule, pour une période donnée, tous les patients ayant bénéficié d'une prestation
+                (constante, vaccination, apport nutritionnel).
+            </p>
+            <ol>
+                <li>Choisissez une <strong>Date de début</strong> et une <strong>Date de fin</strong>, puis cliquez
+                    sur <strong>Filtrer</strong>.</li>
+                <li>Le tableau affiche pour chaque patient l'état nutritionnel, les produits distribués et les
+                    vaccins reçus sur la période.</li>
+                <li>Depuis la colonne <strong>Action</strong>, vous pouvez ouvrir directement la page Vaccin ou
+                    Nutrition du patient.</li>
+                <li>L'icône <i class="fa-solid fa-download"></i> en haut à droite exporte la liste filtrée au
+                    format Excel.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/rdv.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/rdv.png' %}" alt="Liste des rendez-vous">
+                </a>
+                <figcaption>Rendez-vous filtrés sur une période</figcaption>
+            </figure>
+        </section>
+
+        <section id="constante" class="guide-section">
+            <h2><i class="fa-solid fa-weight-scale"></i> Prise de constantes</h2>
+            <p class="lead">
+                Depuis la fiche d'un patient, la page <strong>Constantes</strong> permet d'enregistrer une nouvelle
+                mesure : taille, poids, périmètre brachial (P.B.), IMC, Z-score et indice corporel.
+            </p>
+            <ol>
+                <li>Vérifiez la date de la visite (pré-remplie avec la date du jour).</li>
+                <li>Saisissez les mesures relevées.</li>
+                <li>Cliquez sur <strong>Enregistrer</strong> pour ajouter la mesure à l'historique du patient.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/constante.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/constante.png' %}" alt="Formulaire de prise de constantes">
+                </a>
+                <figcaption>Saisie d'une constante</figcaption>
+            </figure>
+        </section>
+
+        <section id="vaccination" class="guide-section">
+            <h2><i class="fa-solid fa-syringe"></i> Vaccination</h2>
+            <p class="lead">
+                La page <strong>Vaccination</strong> présente le calendrier vaccinal complet, organisé par âge
+                (naissance, 6 semaines, 10 semaines...). Les vaccins déjà reçus par le patient apparaissent
+                pré-cochés.
+            </p>
+            <ol>
+                <li>Cochez les vaccins administrés lors de la visite en cours.</li>
+                <li>La section <strong>Autres vaccin</strong> permet d'ajouter des rappels (VAT) ou des mentions
+                    complémentaires (MILDA, Vaxigrip...).</li>
+                <li>Cliquez sur <strong>Enregistrer</strong> pour valider, ou <strong>Annuler</strong> pour revenir
+                    en arrière sans sauvegarder.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/vaccination.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/vaccination.png' %}" alt="Calendrier de vaccination">
+                </a>
+                <figcaption>Calendrier vaccinal d'un patient</figcaption>
+            </figure>
+        </section>
+
+        <section id="nutrition" class="guide-section">
+            <h2><i class="fa-solid fa-utensils"></i> Suivi nutritionnel</h2>
+            <p class="lead">
+                La page <strong>Rendez-vous nutritionnel</strong> sert à enregistrer une admission ou une sortie du
+                programme de prise en charge de la malnutrition, ainsi que les produits distribués.
+            </p>
+            <ol>
+                <li>Renseignez le code unique, la date d'admission et l'état nutritionnel du patient.</li>
+                <li>Indiquez si le patient a été dépisté (avec son code et le résultat du dépistage).</li>
+                <li>Si le patient sort du programme, renseignez la date et le motif de sortie.</li>
+                <li>Cochez les produits distribués (lait, Plumpy Nut, vitamine A, déparasitant...).</li>
+                <li>Cliquez sur <strong>Enregistrer</strong>.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/nutrition.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/nutrition.png' %}" alt="Formulaire de suivi nutritionnel">
+                </a>
+                <figcaption>Admission / sortie du programme nutritionnel</figcaption>
+            </figure>
+        </section>
+
+        <section id="historique" class="guide-section">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Historique du patient</h2>
+            <p class="lead">
+                Cette page regroupe toutes les informations d'un patient : identité, et onglets
+                <strong>Vaccination</strong>, <strong>Nutrition</strong>, <strong>Constante</strong> et
+                <strong>Apport Nutritionnel</strong> avec l'ensemble des visites enregistrées.
+            </p>
+            <ol>
+                <li>Cliquez sur les onglets pour parcourir chaque type de suivi.</li>
+                <li>Le bouton <strong>Modifier</strong> en haut à droite permet de corriger les informations
+                    générales du patient (nom, quartier, téléphone...).</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/historique.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/historique.png' %}" alt="Historique d'un patient">
+                </a>
+                <figcaption>Historique complet d'un patient</figcaption>
+            </figure>
+        </section>
+
+        <section id="rapports" class="guide-section">
+            <h2><i class="fa-solid fa-file-lines"></i> Rapports</h2>
+            <p class="lead">
+                La page <strong>Rapports</strong> génère les statistiques mensuelles de vaccination et de
+                nutrition : évaluation nutritionnelle par tranche d'âge et sexe, détail des vaccinations
+                effectuées, produits distribués et prise en charge de la malnutrition aiguë.
+            </p>
+            <ol>
+                <li>Sélectionnez la <strong>Date début</strong> et la <strong>Date fin</strong> de la période à
+                    analyser.</li>
+                <li>Cliquez sur <strong>Afficher le rapport</strong> pour recalculer les tableaux.</li>
+                <li>Utilisez <strong>Télécharger DOCX</strong> ou <strong>Télécharger Excel</strong> pour exporter
+                    le rapport et le partager ou l'archiver.</li>
+            </ol>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/rapport.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/rapport.png' %}" alt="Rapport mensuel vaccination et nutrition">
+                </a>
+                <figcaption>Rapport mensuel — vaccination & nutrition</figcaption>
+            </figure>
+        </section>
+
+        <section id="compte" class="guide-section">
+            <h2><i class="fa-solid fa-circle-user"></i> Compte, sauvegarde et aide</h2>
+            <p class="lead">
+                Le menu portant votre nom d'utilisateur, en haut à droite de l'écran, donne accès à vos réglages,
+                à la sauvegarde de la base de données, à ce guide et à la déconnexion.
+            </p>
+            <ul>
+                <li><strong>Paramètres</strong> ouvre l'administration Django (gestion avancée, réservée aux
+                    administrateurs).</li>
+                <li><strong>Aide & Support</strong> ouvre ce guide d'utilisation.</li>
+                <li><strong>Backup</strong> lance une sauvegarde complète de la base de données de l'application.</li>
+                <li><strong>Déconnexion</strong> ferme votre session.</li>
+            </ul>
+            <figure class="guide-figure">
+                <a class="guide-shot" href="{% static 'images/guide/menu_compte.png' %}" target="_blank">
+                    <img src="{% static 'images/guide/menu_compte.png' %}" alt="Menu du compte utilisateur">
+                </a>
+                <figcaption>Menu du compte utilisateur</figcaption>
+            </figure>
+            <div class="guide-tip">
+                <i class="fa-solid fa-circle-info"></i> Pour toute question non couverte par ce guide, contactez
+                l'administrateur de votre centre de santé.
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

@@ -64,6 +64,11 @@ def index(request):
 def login(request):
     return render(request, 'patient/login.html')
 
+#la vue pour le guide d'utilisation (Aide & Support)
+@login_required
+def guide(request):
+    return render(request, 'patient/guide.html')
+
 #la vue pour la page de creation de patient
 def creer_patient(request):
     return render(request, 'patient/creer_patient.html')
@@ -155,18 +160,21 @@ def liste_patients(request):
 # bouton rechercher dans la liste des patients
 def rechercher_patients(request):
     query = request.GET.get("search", "").strip()
+    est_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
 
-    # Si l'utilisateur vide le champ, on retourne à la liste complète
     if query == "":
-        return redirect('liste_patients')   # 👉 remplacer par ton URL d'affichage normal
-
-    # Sinon, filtrer
-    patients = Patient.objects.filter(
-        Q(nom__icontains=query) |
-        Q(prenom__icontains=query) |
-        Q(telephone__icontains=query) |
-        Q(quartier__icontains=query)
-    )
+        if est_ajax:
+            patients = Patient.objects.all()
+        else:
+            # Si l'utilisateur vide le champ (formulaire sans JS), on retourne à la liste complète
+            return redirect('liste_patients')
+    else:
+        patients = Patient.objects.filter(
+            Q(nom__icontains=query) |
+            Q(prenom__icontains=query) |
+            Q(telephone__icontains=query) |
+            Q(quartier__icontains=query)
+        )
 
     aucun_resultat = (not patients.exists())
 
@@ -174,11 +182,17 @@ def rechercher_patients(request):
         patient.derniere_constante = Constante.objects.filter(patient=patient).order_by("-date").first()
         _attacher_derniere_nutrition(patient)
 
-    return render(request, "patient/liste_patients.html", {
+    contexte = {
         "patients": patients,
         "query": query,
         "aucun_resultat": aucun_resultat
-    })
+    }
+
+    # Recherche en direct (AJAX) : on ne renvoie que la grille des patients
+    if est_ajax:
+        return render(request, "patient/_patient_grid.html", contexte)
+
+    return render(request, "patient/liste_patients.html", contexte)
 
 
 

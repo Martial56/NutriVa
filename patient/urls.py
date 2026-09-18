@@ -32,6 +32,7 @@ urlpatterns = [
     path('enregistrer_apport_nutrition/<int:patient_id>/', views.enregistrer_apport_nutrition, name='enregistrer_apport_nutrition'),
     path('historique_patient/<int:patient_id>/', views.historique_patient, name="historique_patient"),
     path('backup/', views.backup_db, name="backup"),
+    path('guide/', views.guide, name="guide"),
 
 
 ]

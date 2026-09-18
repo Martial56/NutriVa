@@ -1,0 +1,45 @@
+{% load static %}
+{% load patient_extras %}
+<div class="patient-kanban-grid">
+    {% for patient in patients %}
+        <div class="patient-col">
+            <a href="{% url 'historique_patient' patient.id %}" class="text-decoration-none text-dark d-block">
+                <div class="patient-row-card">
+                    <div class="patient-row-top">
+                        <div class="patient-row-left">
+                            <div class="avatar-circle">
+                                <img src="{% static 'images/person.png' %}" alt="Photo" width="24" height="24">
+                            </div>
+                            <div class="patient-row-info">
+                                <div class="patient-row-name">{{ patient.nom }} {{ patient.prenom }}</div>
+                                <div class="patient-row-meta">
+                                    <span>{{ patient.age|age_affichage }}</span> &middot;
+                                    <span>{{ patient.sexe }}</span>
+                                    {% if patient.quartier %} &middot; <span>{{ patient.quartier }}</span>{% endif %}
+                                </div>
+                                <div class="patient-row-phone">{{ patient.telephone|default:"—" }}</div>
+                            </div>
+                        </div>
+
+                        {% if patient.derniere_nutrition.etat_label %}
+                            <span class="badge-pill patient-row-etat {{ patient.derniere_nutrition.etat_class }}">{{ patient.derniere_nutrition.etat_label }}</span>
+                        {% endif %}
+                    </div>
+
+                    <hr class="patient-row-divider">
+
+                    <div class="patient-row-footer">
+                        {% if patient.statut == "FE_FA" %}
+                            <a href="{% url 'vaccination' patient.id %}" class="pill-action pill-action-vat" onclick="event.stopPropagation()">VAT</a>
+                        {% else %}
+                            <a href="{% url 'constante' patient.id %}" class="pill-action pill-action-constante" onclick="event.stopPropagation()">Constantes</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    {% empty %}
+        <p class="text-center text-muted mt-4 patient-kanban-empty">Aucun patient enregistré</p>
+    {% endfor %}
+</div>
